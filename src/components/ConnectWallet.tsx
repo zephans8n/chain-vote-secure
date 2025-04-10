@@ -43,7 +43,6 @@ const ConnectWallet = ({ isMobile = false }: ConnectWalletProps) => {
         className="text-amber-600 border-amber-600"
         onClick={() => window.open("https://metamask.io/download/", "_blank")}
         size={isMobile ? "lg" : "default"}
-        className={isMobile ? "w-full" : ""}
       >
         <AlertTriangle className="mr-2 h-4 w-4" />
         Install MetaMask
@@ -55,7 +54,7 @@ const ConnectWallet = ({ isMobile = false }: ConnectWalletProps) => {
     return (
       <Button 
         onClick={handleConnect}
-        className={address ? "w-full" : "w-full btn-gradient"}
+        className={`w-full ${address ? "" : "btn-gradient"}`}
         variant={address ? "outline" : "default"}
         disabled={isLoading || isConnecting}
       >
