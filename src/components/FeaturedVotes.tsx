@@ -2,7 +2,7 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, Calendar, ExternalLink, Clock } from "lucide-react";
+import { Users, Calendar, ExternalLink, Clock, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 // Mock data - in a real app, this would come from your backend or blockchain
@@ -108,3 +108,4 @@ const FeaturedVotes = () => {
 };
 
 export default FeaturedVotes;
+
