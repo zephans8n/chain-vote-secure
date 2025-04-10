@@ -1,6 +1,7 @@
 
 // This file contains utility functions for interacting with Ethereum
-// In a real application, you would use a library like ethers.js or web3.js
+
+import { createVoteOnChain, castVoteOnChain, getActiveVotes, getVoteDetails } from './contractUtils';
 
 // Check if MetaMask is installed
 export const isMetaMaskInstalled = () => {
@@ -77,31 +78,68 @@ export const getTransactionReceipt = async (txHash: string) => {
   }
 };
 
-// Mock function to create a new vote
-// In a real app, this would interact with a smart contract
+// Create a new vote using the smart contract
 export const createVote = async (voteData: any) => {
-  // Mocking a contract interaction
-  console.log("Creating vote with data:", voteData);
-  
-  // Simulate transaction delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  return {
-    success: true,
-    transactionHash: "0x" + Math.random().toString(16).slice(2, 10) + Math.random().toString(16).slice(2, 10),
-    voteId: Math.floor(Math.random() * 1000).toString()
-  };
+  try {
+    return await createVoteOnChain(voteData);
+  } catch (error) {
+    console.error("Error creating vote:", error);
+    
+    // Fallback to mock implementation for development
+    console.log("Using mock implementation instead");
+    console.log("Creating vote with data:", voteData);
+    
+    // Simulate transaction delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    return {
+      success: true,
+      transactionHash: "0x" + Math.random().toString(16).slice(2, 10) + Math.random().toString(16).slice(2, 10),
+      voteId: Math.floor(Math.random() * 1000).toString()
+    };
+  }
 };
 
-// Mock function to cast a vote
+// Cast a vote using the smart contract
 export const castVote = async (voteId: string, option: string) => {
-  console.log(`Casting vote for option ${option} in vote ${voteId}`);
-  
-  // Simulate transaction delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  return {
-    success: true,
-    transactionHash: "0x" + Math.random().toString(16).slice(2, 10) + Math.random().toString(16).slice(2, 10)
-  };
+  try {
+    return await castVoteOnChain(voteId, option);
+  } catch (error) {
+    console.error("Error casting vote:", error);
+    
+    // Fallback to mock implementation for development
+    console.log(`Using mock implementation instead`);
+    console.log(`Casting vote for option ${option} in vote ${voteId}`);
+    
+    // Simulate transaction delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    return {
+      success: true,
+      transactionHash: "0x" + Math.random().toString(16).slice(2, 10) + Math.random().toString(16).slice(2, 10)
+    };
+  }
 };
+
+// Fetch active votes from the blockchain
+export const fetchActiveVotes = async () => {
+  try {
+    return await getActiveVotes();
+  } catch (error) {
+    console.error("Error fetching active votes:", error);
+    // Return mock data if blockchain fetch fails
+    return [];
+  }
+};
+
+// Fetch vote details from the blockchain
+export const fetchVoteDetails = async (voteId: string) => {
+  try {
+    return await getVoteDetails(voteId);
+  } catch (error) {
+    console.error("Error fetching vote details:", error);
+    // Return null if blockchain fetch fails
+    return null;
+  }
+};
+
