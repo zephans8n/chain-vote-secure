@@ -14,6 +14,11 @@ export interface Vote {
   participants?: number;
   totalVotes?: number;
   contractAddress?: string;
+  category?: string;
+  minParticipants?: number;
+  quorum?: number;
+  visibility: 'public' | 'private' | 'token-gated';
+  tags?: string[];
 }
 
 export interface VoteOption {
@@ -29,8 +34,13 @@ export interface VoteCreationData {
   options: string[];
   startDate: string;
   endDate: string;
-  eligibilityType?: 'all' | 'tokenHolders' | 'whitelist';
+  eligibilityType: 'all' | 'tokenHolders' | 'whitelist';
   eligibilityDetails?: any;
+  category: string;
+  minParticipants?: number;
+  quorum?: number;
+  visibility: 'public' | 'private' | 'token-gated';
+  tags?: string[];
 }
 
 export interface WalletState {
