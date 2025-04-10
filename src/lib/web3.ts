@@ -1,7 +1,7 @@
-
 // This file contains utility functions for interacting with Ethereum
 
-import { createVoteOnChain, castVoteOnChain, getActiveVotes, getVoteDetails } from './contractUtils';
+import { createVoteOnChain, castVoteOnChain, getActiveVotes, getVoteDetails, checkWalletConnection } from './contractUtils';
+import { toast } from "@/components/ui/use-toast";
 
 // Check if MetaMask is installed
 export const isMetaMaskInstalled = () => {
@@ -21,6 +21,23 @@ export const connectWallet = async (): Promise<string> => {
     
     // Request account access
     const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+    
+    // Listen for account changes
+    ethereum.on('accountsChanged', (newAccounts: string[]) => {
+      if (newAccounts.length === 0) {
+        // User disconnected their wallet
+        window.location.reload();
+      } else {
+        // Account changed, reload the page to refresh state
+        window.location.reload();
+      }
+    });
+    
+    // Listen for network changes
+    ethereum.on('chainChanged', () => {
+      // Network changed, reload the page to refresh state
+      window.location.reload();
+    });
     
     // Return the first account
     return accounts[0];
@@ -49,13 +66,54 @@ export const getCurrentNetwork = async (): Promise<string> => {
       '0x5': 'Goerli Testnet',
       '0x2a': 'Kovan Testnet',
       '0x89': 'Polygon Mainnet',
-      '0x13881': 'Mumbai Testnet'
+      '0x13881': 'Mumbai Testnet',
+      '0xa86a': 'Avalanche Mainnet',
+      '0xa869': 'Avalanche Testnet'
     };
     
     return networks[chainId] || `Chain ID: ${chainId}`;
   } catch (error) {
     console.error("Error getting network:", error);
     throw error;
+  }
+};
+
+// Ensure user is connected to required network
+export const switchToCorrectNetwork = async (requiredChainId: string) => {
+  try {
+    const { ethereum } = window as any;
+    
+    if (!ethereum) {
+      throw new Error("MetaMask is not installed");
+    }
+    
+    const currentChainId = await ethereum.request({ method: 'eth_chainId' });
+    
+    if (currentChainId !== requiredChainId) {
+      try {
+        // Try to switch to the required network
+        await ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: requiredChainId }],
+        });
+        return true;
+      } catch (switchError: any) {
+        // If the network isn't added to MetaMask, we can't switch to it
+        if (switchError.code === 4902) {
+          toast({
+            title: "Network not found",
+            description: "Please add the required network to MetaMask.",
+            variant: "destructive"
+          });
+        }
+        return false;
+      }
+    }
+    
+    return true;
+  } catch (error) {
+    console.error("Error switching network:", error);
+    return false;
   }
 };
 
@@ -143,3 +201,39 @@ export const fetchVoteDetails = async (voteId: string) => {
   }
 };
 
+// Function to verify if a transaction was successful
+export const verifyTransaction = async (txHash: string) => {
+  try {
+    const receipt = await getTransactionReceipt(txHash);
+    
+    if (!receipt) {
+      return {
+        confirmed: false,
+        message: "Transaction is still pending"
+      };
+    }
+    
+    if (receipt.status === 1 || receipt.status === '0x1') {
+      return {
+        confirmed: true,
+        message: "Transaction was successful"
+      };
+    } else {
+      return {
+        confirmed: false,
+        message: "Transaction failed"
+      };
+    }
+  } catch (error) {
+    console.error("Error verifying transaction:", error);
+    return {
+      confirmed: false,
+      message: "Error checking transaction status"
+    };
+  }
+};
+
+// Function to check wallet connection status
+export const checkWalletStatus = async () => {
+  return await checkWalletConnection();
+};

@@ -1,9 +1,9 @@
-
 import { ethers } from 'ethers';
 import VotingContractABI from '../contracts/VotingContractABI.json';
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/use-toast";
 
-const CONTRACT_ADDRESS = '0x0'; // You'll need to deploy the contract and update this
+// Update this after deploying your contract to a testnet/mainnet
+const CONTRACT_ADDRESS = '0x123abc...'; // Placeholder - replace with your deployed contract address
 
 export interface VoteData {
   title: string;
@@ -197,5 +197,45 @@ export const getVoteDetails = async (voteId: string) => {
   } catch (error) {
     console.error("Error fetching vote details:", error);
     return null;
+  }
+};
+
+// New function to check if user has MetaMask and is on the correct network
+export const checkWalletConnection = async () => {
+  try {
+    const { ethereum } = window as any;
+    
+    if (!ethereum) {
+      return {
+        connected: false,
+        error: "MetaMask not installed"
+      };
+    }
+    
+    const accounts = await ethereum.request({ method: 'eth_accounts' });
+    
+    if (accounts.length === 0) {
+      return {
+        connected: false,
+        error: "No accounts found"
+      };
+    }
+    
+    const chainId = await ethereum.request({ method: 'eth_chainId' });
+    
+    // You can customize this to check for specific networks
+    // For example, if you want to ensure users are on a specific testnet
+    
+    return {
+      connected: true,
+      address: accounts[0],
+      chainId: chainId
+    };
+  } catch (error) {
+    console.error("Error checking wallet:", error);
+    return {
+      connected: false,
+      error: "Error checking wallet connection"
+    };
   }
 };
