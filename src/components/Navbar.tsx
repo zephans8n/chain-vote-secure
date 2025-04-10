@@ -1,12 +1,17 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import ConnectWallet from './ConnectWallet';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+
+  const isActive = (path: string) => {
+    return location.pathname === path ? "text-voting-primary font-medium" : "text-gray-600";
+  };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -27,13 +32,13 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            <Link to="/" className="text-gray-600 hover:text-voting-primary transition-colors">
+            <Link to="/" className={`hover:text-voting-primary transition-colors ${isActive("/")}`}>
               Home
             </Link>
-            <Link to="/votes" className="text-gray-600 hover:text-voting-primary transition-colors">
+            <Link to="/votes" className={`hover:text-voting-primary transition-colors ${isActive("/votes")}`}>
               Explore Votes
             </Link>
-            <Link to="/create" className="text-gray-600 hover:text-voting-primary transition-colors">
+            <Link to="/create" className={`hover:text-voting-primary transition-colors ${isActive("/create")}`}>
               Create Vote
             </Link>
             <ConnectWallet />
@@ -57,21 +62,21 @@ const Navbar = () => {
           <div className="md:hidden pt-4 pb-3 space-y-3">
             <Link 
               to="/" 
-              className="block py-2 px-4 text-gray-600 hover:text-voting-primary hover:bg-gray-50 rounded-md"
+              className={`block py-2 px-4 hover:text-voting-primary hover:bg-gray-50 rounded-md ${isActive("/")}`}
               onClick={() => setIsMenuOpen(false)}
             >
               Home
             </Link>
             <Link 
               to="/votes" 
-              className="block py-2 px-4 text-gray-600 hover:text-voting-primary hover:bg-gray-50 rounded-md"
+              className={`block py-2 px-4 hover:text-voting-primary hover:bg-gray-50 rounded-md ${isActive("/votes")}`}
               onClick={() => setIsMenuOpen(false)}
             >
               Explore Votes
             </Link>
             <Link 
               to="/create" 
-              className="block py-2 px-4 text-gray-600 hover:text-voting-primary hover:bg-gray-50 rounded-md"
+              className={`block py-2 px-4 hover:text-voting-primary hover:bg-gray-50 rounded-md ${isActive("/create")}`}
               onClick={() => setIsMenuOpen(false)}
             >
               Create Vote

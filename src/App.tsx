@@ -8,28 +8,36 @@ import { VotingProvider } from "@/context/VotingContext";
 import Index from "./pages/Index";
 import CreateVote from "./pages/CreateVote";
 import NotFound from "./pages/NotFound";
+import VotesList from "./pages/VotesList"; // Import the VotesList component we'll create
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <VotingProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
+  <BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <VotingProvider>
+          <Toaster />
+          <Sonner />
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/votes" element={<Index />} /> {/* Placeholder, will be updated in future */}
-            <Route path="/votes/:id" element={<Index />} /> {/* Placeholder, will be updated in future */}
+            <Route path="/votes" element={<VotesList />} />
+            <Route path="/votes/:id" element={<Index />} /> {/* We'll keep this as is for now */}
             <Route path="/create" element={<CreateVote />} /> 
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </BrowserRouter>
-      </VotingProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+        </VotingProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </BrowserRouter>
 );
 
 export default App;
