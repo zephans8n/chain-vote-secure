@@ -27,10 +27,10 @@ The project is organized into two main components:
 
 ## Prerequisites
 
-- Node.js (v14+ recommended)
+- Node.js (v18+ recommended)
 - npm or yarn
 - MetaMask extension installed in your browser
-- [Alchemy](https://www.alchemy.com/) or [Infura](https://infura.io/) account for deploying to testnets/mainnet
+- [Infura](https://infura.io/) account for deploying to Sepolia testnet
 
 ## Environment Setup
 
@@ -43,7 +43,7 @@ cp .env.example .env
 ```
 
 2. **Update the `.env` file with your credentials:**
-   - Add your Alchemy/Infura API endpoints
+   - Add your Infura API endpoints (especially for Sepolia)
    - Add your wallet private key (without 0x prefix)
    - Add your Etherscan API key for contract verification
    - Don't worry about CONTRACT_ADDRESS, it will be filled automatically during deployment
@@ -86,86 +86,61 @@ npx hardhat run scripts/deploy.js --network localhost
 npm run dev
 ```
 
-## Deployment Process
+## Deployment to Sepolia Testnet
 
-### Step 1: Smart Contract Deployment
+### Step 1: Smart Contract Deployment to Sepolia
 
-1. **Make sure your `.env` file is properly configured** with network endpoints and private key.
+1. **Make sure your `.env` file is properly configured**:
+   - `SEPOLIA_URL` should be your Infura Sepolia endpoint (https://sepolia.infura.io/v3/your-project-id)
+   - `PRIVATE_KEY` should be your wallet private key (without 0x prefix)
+   - `ETHERSCAN_API_KEY` should be your Etherscan API key
 
-2. **Deploy to a testnet** (Goerli or Sepolia is recommended for testing)
+2. **Deploy to Sepolia testnet**:
 
 ```bash
-npx hardhat run scripts/deploy.js --network goerli
-# OR
 npx hardhat run scripts/deploy.js --network sepolia
 ```
 
-3. **Verify contract on Etherscan** (makes your contract code readable and verifiable)
+3. **Verify contract on Etherscan**:
 
 ```bash
 npx hardhat verify --network sepolia DEPLOYED_CONTRACT_ADDRESS
 ```
 
-4. **Deploy to mainnet** (when ready for production)
+### Step 2: Testing on Sepolia
 
-```bash
-npx hardhat run scripts/deploy.js --network mainnet
-```
+1. **Get test ETH** from the [Sepolia faucet](https://sepolia-faucet.pk910.de/)
 
-### Step 2: Frontend Deployment
+2. **Test your application with MetaMask**:
+   - Add the Sepolia network to MetaMask if not already added
+   - Connect your application to the Sepolia network
+   - Create and cast votes to ensure everything works correctly
 
-1. **Build the frontend**
+3. **Monitor your contract** on [Sepolia Etherscan](https://sepolia.etherscan.io/)
+
+### Step 3: Frontend Deployment
+
+1. **Build the frontend**:
 
 ```bash
 npm run build
 ```
 
-2. **Deploy to your preferred hosting service**
+2. **Deploy to your preferred hosting service** (Netlify, Vercel, etc.)
 
-- Netlify: Connect your GitHub repository and set the build command to `npm run build`
-- Vercel: Import your project and it will automatically detect the build settings
-- GitHub Pages: Push the build folder to a gh-pages branch
-- AWS S3/CloudFront: Upload the build folder to an S3 bucket configured for static website hosting
-
-### Step 3: Post-Deployment Verification
-
-1. **Test the deployed application**
-   - Verify you can connect your wallet
-   - Create a test vote
-   - Cast votes from different addresses
-   - Check that results are displayed correctly
-
-2. **Monitor smart contract usage**
-   - Use [Etherscan](https://etherscan.io/) to monitor contract transactions
-   - Set up alerts for any unusual activity
-
-## Hardhat Tasks and Commands
-
-Here are some useful Hardhat commands for blockchain development:
+## Additional Hardhat Commands
 
 ```bash
-# Compile contracts
-npx hardhat compile
+# Get Sepolia network info
+npx hardhat network --network sepolia
 
-# Run all tests
-npx hardhat test
+# Get account balances on Sepolia
+npx hardhat accounts --network sepolia
 
-# Run a specific test
-npx hardhat test test/VotingContract.test.js
+# Generate TypeScript types from ABI
+npx hardhat typechain
 
-# Deploy to a specific network
-npx hardhat run scripts/deploy.js --network <network-name>
-
-# Start local blockchain
-npx hardhat node
-
-# Get account balances
-npx hardhat accounts
-
-# Clean artifacts
-npx hardhat clean
-
-# Get help
+# Get help with Hardhat
 npx hardhat help
 ```
 
@@ -173,7 +148,7 @@ npx hardhat help
 
 - **Gas Optimization**: The contract has been designed with gas efficiency in mind
 - **Security**: Basic security practices have been implemented, but consider a professional audit before mainnet deployment
-- **Scaling**: For high-volume voting scenarios, consider layer 2 solutions like Polygon or Optimism
+- **Sepolia Testnet**: Ideal for testing before moving to mainnet
 
 ## Contributing
 

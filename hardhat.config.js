@@ -1,9 +1,18 @@
 
 require('dotenv').config();
+require('@nomicfoundation/hardhat-verify');
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
-  solidity: "0.8.19",
+  solidity: {
+    version: "0.8.19",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200
+      }
+    }
+  },
   paths: {
     sources: "./contracts",
     tests: "./test",
@@ -14,14 +23,18 @@ module.exports = {
     hardhat: {
       chainId: 1337
     },
-    // Add mainnet and testnet configurations for deployment
-    goerli: {
-      url: process.env.GOERLI_URL || "",
-      accounts: process.env.PRIVATE_KEY ? [`0x${process.env.PRIVATE_KEY}`] : [],
-      gasPrice: 20000000000 // 20 gwei
-    },
     sepolia: {
       url: process.env.SEPOLIA_URL || "",
+      accounts: process.env.PRIVATE_KEY ? [`0x${process.env.PRIVATE_KEY}`] : [],
+      gasPrice: 20000000000, // 20 gwei
+      verify: {
+        etherscan: {
+          apiKey: process.env.ETHERSCAN_API_KEY
+        }
+      }
+    },
+    goerli: {
+      url: process.env.GOERLI_URL || "",
       accounts: process.env.PRIVATE_KEY ? [`0x${process.env.PRIVATE_KEY}`] : [],
       gasPrice: 20000000000 // 20 gwei
     },
@@ -32,7 +45,6 @@ module.exports = {
     }
   },
   etherscan: {
-    // For verifying contracts on Etherscan
     apiKey: process.env.ETHERSCAN_API_KEY || ""
   }
 };
