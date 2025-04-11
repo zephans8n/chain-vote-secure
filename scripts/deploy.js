@@ -1,5 +1,7 @@
 
 const { ethers } = require("hardhat");
+const fs = require("fs");
+const path = require("path");
 
 async function main() {
   // Get the contract factory
@@ -14,8 +16,27 @@ async function main() {
   
   console.log("VotingContract deployed to:", votingContract.address);
   
-  // You can save this address to your frontend configuration
-  console.log("Update CONTRACT_ADDRESS in src/lib/contractUtils.ts with this address");
+  // Update the contract address in contractUtils.ts
+  const contractUtilsPath = path.join(__dirname, "../src/frontend/lib/contractUtils.ts");
+  
+  // Check if the file exists before trying to update it
+  if (fs.existsSync(contractUtilsPath)) {
+    let contractUtils = fs.readFileSync(contractUtilsPath, "utf8");
+    
+    // Replace the contract address placeholder with the actual address
+    contractUtils = contractUtils.replace(
+      /const CONTRACT_ADDRESS = ['"].*['"]/,
+      `const CONTRACT_ADDRESS = '${votingContract.address}'`
+    );
+    
+    // Write the updated file
+    fs.writeFileSync(contractUtilsPath, contractUtils);
+    
+    console.log(`Updated CONTRACT_ADDRESS in ${contractUtilsPath}`);
+  } else {
+    console.log(`Cannot find ${contractUtilsPath} to update contract address`);
+    console.log(`Please manually update CONTRACT_ADDRESS in your frontend code with: ${votingContract.address}`);
+  }
 }
 
 // Run the deployment

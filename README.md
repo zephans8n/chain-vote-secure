@@ -1,73 +1,156 @@
-# Welcome to your Lovable project
 
-## Project info
+# ChainVote - Blockchain Voting Application
 
-**URL**: https://lovable.dev/projects/20958fd4-8909-4116-8381-67bbe9d7e587
+ChainVote is a decentralized voting application built on Ethereum that allows users to create and participate in transparent, tamper-proof voting processes.
 
-## How can I edit this code?
+## Project Structure
 
-There are several ways of editing your application.
+The project is organized into two main components:
 
-**Use Lovable**
+- **Frontend**: React application with TypeScript that provides the user interface
+- **Backend**: Solidity smart contracts that handle the voting logic on the blockchain
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/20958fd4-8909-4116-8381-67bbe9d7e587) and start prompting.
+```
+📦 ChainVote
+ ┣ 📂 src
+ ┃ ┣ 📂 backend
+ ┃ ┃ ┣ 📂 contracts       # Solidity smart contracts
+ ┃ ┃ ┗ 📂 artifacts       # Compiled contract artifacts
+ ┃ ┣ 📂 frontend
+ ┃ ┃ ┣ 📂 context         # React context providers
+ ┃ ┃ ┣ 📂 lib             # Utility functions for blockchain interaction
+ ┃ ┣ 📂 components        # React components
+ ┃ ┣ 📂 hooks             # Custom React hooks
+ ┃ ┣ 📂 pages             # Page components
+ ┃ ┗ 📜 App.tsx           # Main application component
+ ┣ 📂 scripts             # Deployment and utility scripts
+ ┣ 📂 test                # Smart contract tests
+ ┣ 📜 hardhat.config.js   # Hardhat configuration
+ ┗ 📜 README.md           # Project documentation
+```
 
-Changes made via Lovable will be committed automatically to this repo.
+## Prerequisites
 
-**Use your preferred IDE**
+- Node.js (v14+ recommended)
+- npm or yarn
+- MetaMask extension installed in your browser
+- [Alchemy](https://www.alchemy.com/) or [Infura](https://infura.io/) account for deploying to testnets/mainnet
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Development Setup
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+1. **Clone the repository**
 
-Follow these steps:
+```bash
+git clone <repository-url>
+cd chainvote
+```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+2. **Install dependencies**
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+```bash
+npm install
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
+3. **Compile smart contracts**
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+npx hardhat compile
+```
+
+4. **Run smart contract tests**
+
+```bash
+npx hardhat test
+```
+
+5. **Start local blockchain**
+
+```bash
+npx hardhat node
+```
+
+6. **Deploy contracts to local blockchain** (in a new terminal)
+
+```bash
+npx hardhat run scripts/deploy.js --network localhost
+```
+
+7. **Start the frontend development server**
+
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Deployment Process
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Step 1: Smart Contract Deployment
 
-**Use GitHub Codespaces**
+1. **Create a `.env` file in the project root** with the following content:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```
+PRIVATE_KEY=your_ethereum_private_key_without_0x_prefix
+GOERLI_URL=your_alchemy_or_infura_goerli_endpoint
+SEPOLIA_URL=your_alchemy_or_infura_sepolia_endpoint
+MAINNET_URL=your_alchemy_or_infura_mainnet_endpoint
+```
 
-## What technologies are used for this project?
+2. **Deploy to a testnet** (Goerli or Sepolia is recommended)
 
-This project is built with:
+```bash
+npx hardhat run scripts/deploy.js --network goerli
+# OR
+npx hardhat run scripts/deploy.js --network sepolia
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+3. **Verify contract on Etherscan** (optional but recommended)
 
-## How can I deploy this project?
+```bash
+npx hardhat verify --network goerli DEPLOYED_CONTRACT_ADDRESS
+```
 
-Simply open [Lovable](https://lovable.dev/projects/20958fd4-8909-4116-8381-67bbe9d7e587) and click on Share -> Publish.
+### Step 2: Frontend Deployment
 
-## Can I connect a custom domain to my Lovable project?
+1. **Build the frontend**
 
-Yes it is!
+```bash
+npm run build
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+2. **Deploy to your preferred hosting service**
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- Netlify: Connect your GitHub repository and set the build command to `npm run build`
+- Vercel: Import your project and it will automatically detect the build settings
+- GitHub Pages: Push the build folder to a gh-pages branch
+- AWS S3/CloudFront: Upload the build folder to an S3 bucket configured for static website hosting
+
+### Step 3: Post-Deployment Verification
+
+1. **Test the deployed application**
+   - Verify you can connect your wallet
+   - Create a test vote
+   - Cast votes from different addresses
+   - Check that results are displayed correctly
+
+2. **Monitor smart contract usage**
+   - Use [Etherscan](https://etherscan.io/) to monitor contract transactions
+   - Set up alerts for any unusual activity
+
+## Usage Guide
+
+1. **Connect your Ethereum wallet** by clicking the "Connect Wallet" button
+2. **Browse active votes** on the homepage or votes page
+3. **Create a new vote** by clicking "Create Vote" and filling out the form
+4. **Cast your vote** by selecting an option and confirming the transaction
+5. **View results** after voting or after the vote has ended
+
+## Local Development with Hardhat
+
+For more details on using Hardhat for local development and testing, refer to [HARDHAT_README.md](./HARDHAT_README.md).
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

@@ -32,7 +32,7 @@ npx hardhat node
 
 ### Development Workflow
 
-1. Write or modify smart contracts in `src/contracts/`
+1. Write or modify smart contracts in `src/backend/contracts/`
 2. Write tests for your contracts in `test/`
 3. Run tests with `npx hardhat test`
 4. Deploy contracts to local network for testing
@@ -40,19 +40,13 @@ npx hardhat node
 
 ### Contract Deployment
 
-When deploying to a testnet or mainnet, update the `hardhat.config.js` file with your network configuration and private key:
+When deploying to a testnet or mainnet, update the `.env` file with your network configuration and private key:
 
-```javascript
-// Example network configuration (add this to hardhat.config.js)
-networks: {
-  hardhat: {
-    chainId: 1337
-  },
-  goerli: {
-    url: `https://goerli.infura.io/v3/YOUR_INFURA_PROJECT_ID`,
-    accounts: [`0x${YOUR_PRIVATE_KEY}`]
-  }
-}
+```
+PRIVATE_KEY=your_ethereum_private_key_without_0x_prefix
+GOERLI_URL=your_alchemy_or_infura_goerli_endpoint
+SEPOLIA_URL=your_alchemy_or_infura_sepolia_endpoint
+MAINNET_URL=your_alchemy_or_infura_mainnet_endpoint
 ```
 
 Then deploy with:
@@ -62,4 +56,21 @@ npx hardhat run scripts/deploy.js --network goerli
 
 ### Interacting with Deployed Contracts
 
-After deployment, update the `CONTRACT_ADDRESS` variable in `src/lib/contractUtils.ts` with the deployed contract address.
+After deployment, the deploy script will automatically update the `CONTRACT_ADDRESS` variable in `src/frontend/lib/contractUtils.ts` with the deployed contract address.
+
+### Gas Optimization
+
+To optimize gas usage in your contracts:
+
+1. Use calldata instead of memory for function parameters that don't change
+2. Pack variables efficiently (using uint8, uint16 where appropriate)
+3. Use events to store data that doesn't need on-chain access
+4. Consider batch operations for multiple transactions
+
+### Security Best Practices
+
+1. Always use the latest Solidity version
+2. Add proper access control to sensitive functions
+3. Implement reentrancy guards for external calls
+4. Validate all inputs thoroughly
+5. Consider having your contract audited before mainnet deployment
