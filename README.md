@@ -12,21 +12,17 @@ The project is organized into two main components:
 
 ```
 📦 ChainVote
- ┣ 📂 src
- ┃ ┣ 📂 backend
- ┃ ┃ ┣ 📂 contracts       # Solidity smart contracts
- ┃ ┃ ┗ 📂 artifacts       # Compiled contract artifacts
- ┃ ┣ 📂 frontend
- ┃ ┃ ┣ 📂 context         # React context providers
- ┃ ┃ ┣ 📂 lib             # Utility functions for blockchain interaction
- ┃ ┣ 📂 components        # React components
- ┃ ┣ 📂 hooks             # Custom React hooks
- ┃ ┣ 📂 pages             # Page components
- ┃ ┗ 📜 App.tsx           # Main application component
- ┣ 📂 scripts             # Deployment and utility scripts
- ┣ 📂 test                # Smart contract tests
- ┣ 📜 hardhat.config.js   # Hardhat configuration
- ┗ 📜 README.md           # Project documentation
+ ┣ 📂 contracts         # Solidity smart contracts
+ ┣ 📂 scripts           # Deployment and utility scripts
+ ┣ 📂 test              # Smart contract tests
+ ┣ 📂 src               # Frontend source code
+ ┃ ┣ 📂 components      # React components
+ ┃ ┣ 📂 hooks           # Custom React hooks
+ ┃ ┣ 📂 lib             # Utility functions for blockchain interaction
+ ┃ ┣ 📂 pages           # Page components
+ ┃ ┗ 📜 App.tsx         # Main application component
+ ┣ 📜 hardhat.config.js # Hardhat configuration
+ ┗ 📜 README.md         # Project documentation
 ```
 
 ## Prerequisites
@@ -36,46 +32,54 @@ The project is organized into two main components:
 - MetaMask extension installed in your browser
 - [Alchemy](https://www.alchemy.com/) or [Infura](https://infura.io/) account for deploying to testnets/mainnet
 
-## Development Setup
+## Environment Setup
 
-1. **Clone the repository**
+1. **Create a `.env` file in the project root**
+   
+   Copy the `.env.example` file to `.env` and fill in your values:
 
 ```bash
-git clone <repository-url>
-cd chainvote
+cp .env.example .env
 ```
 
-2. **Install dependencies**
+2. **Update the `.env` file with your credentials:**
+   - Add your Alchemy/Infura API endpoints
+   - Add your wallet private key (without 0x prefix)
+   - Don't worry about CONTRACT_ADDRESS, it will be filled automatically during deployment
+
+## Development Setup
+
+1. **Install dependencies**
 
 ```bash
 npm install
 ```
 
-3. **Compile smart contracts**
+2. **Compile smart contracts**
 
 ```bash
 npx hardhat compile
 ```
 
-4. **Run smart contract tests**
+3. **Run smart contract tests**
 
 ```bash
 npx hardhat test
 ```
 
-5. **Start local blockchain**
+4. **Start local blockchain**
 
 ```bash
 npx hardhat node
 ```
 
-6. **Deploy contracts to local blockchain** (in a new terminal)
+5. **Deploy contracts to local blockchain** (in a new terminal)
 
 ```bash
 npx hardhat run scripts/deploy.js --network localhost
 ```
 
-7. **Start the frontend development server**
+6. **Start the frontend development server**
 
 ```bash
 npm run dev
@@ -85,14 +89,7 @@ npm run dev
 
 ### Step 1: Smart Contract Deployment
 
-1. **Create a `.env` file in the project root** with the following content:
-
-```
-PRIVATE_KEY=your_ethereum_private_key_without_0x_prefix
-GOERLI_URL=your_alchemy_or_infura_goerli_endpoint
-SEPOLIA_URL=your_alchemy_or_infura_sepolia_endpoint
-MAINNET_URL=your_alchemy_or_infura_mainnet_endpoint
-```
+1. **Make sure your `.env` file is properly configured** with network endpoints and private key.
 
 2. **Deploy to a testnet** (Goerli or Sepolia is recommended)
 
@@ -142,10 +139,6 @@ npm run build
 3. **Create a new vote** by clicking "Create Vote" and filling out the form
 4. **Cast your vote** by selecting an option and confirming the transaction
 5. **View results** after voting or after the vote has ended
-
-## Local Development with Hardhat
-
-For more details on using Hardhat for local development and testing, refer to [HARDHAT_README.md](./HARDHAT_README.md).
 
 ## Contributing
 

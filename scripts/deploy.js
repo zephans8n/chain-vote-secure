@@ -2,6 +2,7 @@
 const { ethers } = require("hardhat");
 const fs = require("fs");
 const path = require("path");
+require('dotenv').config();
 
 async function main() {
   // Get the contract factory
@@ -16,8 +17,24 @@ async function main() {
   
   console.log("VotingContract deployed to:", votingContract.address);
   
+  // Update the contract address in the .env file if it exists
+  try {
+    const envFilePath = path.join(__dirname, "../.env");
+    if (fs.existsSync(envFilePath)) {
+      let envContent = fs.readFileSync(envFilePath, "utf8");
+      envContent = envContent.replace(
+        /CONTRACT_ADDRESS=.*/,
+        `CONTRACT_ADDRESS=${votingContract.address}`
+      );
+      fs.writeFileSync(envFilePath, envContent);
+      console.log("Updated CONTRACT_ADDRESS in .env file");
+    }
+  } catch (error) {
+    console.log("Could not update .env file:", error);
+  }
+  
   // Update the contract address in contractUtils.ts
-  const contractUtilsPath = path.join(__dirname, "../src/frontend/lib/contractUtils.ts");
+  const contractUtilsPath = path.join(__dirname, "../src/lib/contractUtils.ts");
   
   // Check if the file exists before trying to update it
   if (fs.existsSync(contractUtilsPath)) {

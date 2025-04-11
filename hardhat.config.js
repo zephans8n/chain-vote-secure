@@ -1,12 +1,14 @@
 
+require('dotenv').config();
+
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: "0.8.19",
   paths: {
-    sources: "./src/backend/contracts",
+    sources: "./contracts",
     tests: "./test",
     cache: "./cache",
-    artifacts: "./src/backend/artifacts"
+    artifacts: "./artifacts"
   },
   networks: {
     hardhat: {
