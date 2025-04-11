@@ -45,6 +45,7 @@ cp .env.example .env
 2. **Update the `.env` file with your credentials:**
    - Add your Alchemy/Infura API endpoints
    - Add your wallet private key (without 0x prefix)
+   - Add your Etherscan API key for contract verification
    - Don't worry about CONTRACT_ADDRESS, it will be filled automatically during deployment
 
 ## Development Setup
@@ -91,7 +92,7 @@ npm run dev
 
 1. **Make sure your `.env` file is properly configured** with network endpoints and private key.
 
-2. **Deploy to a testnet** (Goerli or Sepolia is recommended)
+2. **Deploy to a testnet** (Goerli or Sepolia is recommended for testing)
 
 ```bash
 npx hardhat run scripts/deploy.js --network goerli
@@ -99,10 +100,16 @@ npx hardhat run scripts/deploy.js --network goerli
 npx hardhat run scripts/deploy.js --network sepolia
 ```
 
-3. **Verify contract on Etherscan** (optional but recommended)
+3. **Verify contract on Etherscan** (makes your contract code readable and verifiable)
 
 ```bash
-npx hardhat verify --network goerli DEPLOYED_CONTRACT_ADDRESS
+npx hardhat verify --network sepolia DEPLOYED_CONTRACT_ADDRESS
+```
+
+4. **Deploy to mainnet** (when ready for production)
+
+```bash
+npx hardhat run scripts/deploy.js --network mainnet
 ```
 
 ### Step 2: Frontend Deployment
@@ -132,13 +139,41 @@ npm run build
    - Use [Etherscan](https://etherscan.io/) to monitor contract transactions
    - Set up alerts for any unusual activity
 
-## Usage Guide
+## Hardhat Tasks and Commands
 
-1. **Connect your Ethereum wallet** by clicking the "Connect Wallet" button
-2. **Browse active votes** on the homepage or votes page
-3. **Create a new vote** by clicking "Create Vote" and filling out the form
-4. **Cast your vote** by selecting an option and confirming the transaction
-5. **View results** after voting or after the vote has ended
+Here are some useful Hardhat commands for blockchain development:
+
+```bash
+# Compile contracts
+npx hardhat compile
+
+# Run all tests
+npx hardhat test
+
+# Run a specific test
+npx hardhat test test/VotingContract.test.js
+
+# Deploy to a specific network
+npx hardhat run scripts/deploy.js --network <network-name>
+
+# Start local blockchain
+npx hardhat node
+
+# Get account balances
+npx hardhat accounts
+
+# Clean artifacts
+npx hardhat clean
+
+# Get help
+npx hardhat help
+```
+
+## Optimization Tips
+
+- **Gas Optimization**: The contract has been designed with gas efficiency in mind
+- **Security**: Basic security practices have been implemented, but consider a professional audit before mainnet deployment
+- **Scaling**: For high-volume voting scenarios, consider layer 2 solutions like Polygon or Optimism
 
 ## Contributing
 
