@@ -1,15 +1,13 @@
-
 import { ethers } from 'ethers';
 import { toast } from "@/components/ui/use-toast";
 
 // This will be populated with your contract ABI after compiling with Hardhat
-// Import it from the artifacts directory after compiling
-// For now using a placeholder - you'll need to replace this
-const CONTRACT_ABI = [] as any;
+// You'll need to manually paste the ABI after contract compilation
+const CONTRACT_ABI = [] as any; // Replace this with your contract ABI after deployment
 
 // Update this after deploying your contract to a testnet/mainnet
-// Should come from environment variables
-const CONTRACT_ADDRESS = ''; // Placeholder - replace with your deployed contract address
+// This should match your .env CONTRACT_ADDRESS
+const CONTRACT_ADDRESS = ''; // Replace with your deployed contract address
 
 export interface VoteData {
   title: string;

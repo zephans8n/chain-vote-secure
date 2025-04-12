@@ -1,6 +1,8 @@
 import { ethers } from 'ethers';
-import VotingContractABI from '../../backend/contracts/VotingContractABI.json';
 import { toast } from "@/components/ui/use-toast";
+
+// This should be loaded from an external file after contract deployment
+const VotingContractABI = []; // Empty placeholder - to be populated after contract deployment
 
 // Update this after deploying your contract to a testnet/mainnet
 const CONTRACT_ADDRESS = '0x123abc...'; // Placeholder - replace with your deployed contract address
