@@ -6,7 +6,7 @@ import { toast } from "@/components/ui/use-toast";
 // You'll need to manually paste the ABI after contract deployment
 const CONTRACT_ABI = [] as any; // Replace this with your contract ABI after deployment
 
-// Update this after deploying your contract to a testnet/mainnet
+// Update this after deploying your contract to Sepolia
 // This should match your .env CONTRACT_ADDRESS
 const CONTRACT_ADDRESS = ''; // Replace with your deployed contract address
 

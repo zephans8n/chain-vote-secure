@@ -99,15 +99,13 @@ async function main() {
 
     console.log("\n\x1b[32m%s\x1b[0m", "Deployment completed successfully!");
     console.log("\nVerify your contract with:");
-    console.log(`npx hardhat verify --network ${network.name} ${votingContract.address}`);
+    console.log(`npx hardhat verify --network sepolia ${votingContract.address}`);
     
     // Add Sepolia-specific instructions
-    if (network.name === 'sepolia') {
-      console.log("\nView your contract on Sepolia Etherscan:");
-      console.log(`https://sepolia.etherscan.io/address/${votingContract.address}`);
-      console.log("\nRemember to fund your wallet with Sepolia ETH from:");
-      console.log("https://sepolia-faucet.pk910.de/");
-    }
+    console.log("\nView your contract on Sepolia Etherscan:");
+    console.log(`https://sepolia.etherscan.io/address/${votingContract.address}`);
+    console.log("\nRemember to fund your wallet with Sepolia ETH from:");
+    console.log("https://sepolia-faucet.pk910.de/");
   } catch (error) {
     console.error("\x1b[31m%s\x1b[0m", "Error during deployment:", error);
     process.exit(1);

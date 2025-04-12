@@ -1,7 +1,7 @@
 
 # ChainVote - Blockchain Voting Application
 
-ChainVote is a decentralized voting application built on Ethereum that allows users to create and participate in transparent, tamper-proof voting processes.
+ChainVote is a decentralized voting application built on Ethereum that allows users to create and participate in transparent, tamper-proof voting processes on the Sepolia testnet.
 
 ## Project Structure
 
@@ -23,8 +23,8 @@ The project is a React frontend application designed to interact with a voting s
 - Node.js (v18+ recommended)
 - npm or yarn
 - MetaMask extension installed in your browser
-- [Infura](https://infura.io/) account for testnet and mainnet connections
-- Hardhat for smart contract development and deployment (in a separate project)
+- [Infura](https://infura.io/) account for Sepolia testnet connection
+- Hardhat for smart contract deployment and verification
 
 ## Required Smart Contract Interface
 
@@ -60,10 +60,12 @@ cp .env.example .env
 ```
 
 2. **Update the `.env` file with your credentials:**
-   - Add your Infura API endpoints (especially for Sepolia)
+   - Add your Infura API endpoint for Sepolia
+   - Add your wallet private key for deployment
+   - Add your Etherscan API key for contract verification
    - After deployment, update CONTRACT_ADDRESS with your deployed contract address
 
-## Development Setup
+## Deployment Steps
 
 1. **Install dependencies**
 
@@ -71,23 +73,30 @@ cp .env.example .env
 npm install
 ```
 
-2. **Deploy your smart contract using Hardhat** (in a separate project)
+2. **Deploy your smart contract to Sepolia**
 
-After deploying your contract:
+```bash
+npx hardhat run scripts/deploy-sepolia.js --network sepolia
+```
 
-- Update the CONTRACT_ADDRESS in your `.env` file
-- Copy your contract ABI to the project
-- Update the reference to the ABI in `src/lib/contractUtils.ts`
+This will:
+- Deploy the contract to Sepolia network
+- Update your `.env` file with the deployed contract address
+- Update the contract ABI in your frontend code
 
-3. **Start the frontend development server**
+3. **Verify the contract on Etherscan**
+
+```bash
+npx hardhat verify --network sepolia YOUR_CONTRACT_ADDRESS
+```
+
+4. **Start the frontend development server**
 
 ```bash
 npm run dev
 ```
 
-## Using with different networks
-
-### Sepolia Testnet
+## Using the Sepolia Testnet
 
 1. Make sure you have deployed your contract to Sepolia
 2. Update your `.env` file with the contract address
