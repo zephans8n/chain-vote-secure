@@ -61,8 +61,6 @@ cp .env.example .env
 
 2. **Update the `.env` file with your credentials:**
    - Add your Infura API endpoints (especially for Sepolia)
-   - Add your wallet private key
-   - Add your Etherscan API key for contract verification
    - After deployment, update CONTRACT_ADDRESS with your deployed contract address
 
 ## Development Setup
@@ -79,7 +77,7 @@ After deploying your contract:
 
 - Update the CONTRACT_ADDRESS in your `.env` file
 - Copy your contract ABI to the project
-- Update the reference to the ABI in `src/frontend/lib/contractUtils.ts`
+- Update the reference to the ABI in `src/lib/contractUtils.ts`
 
 3. **Start the frontend development server**
 
