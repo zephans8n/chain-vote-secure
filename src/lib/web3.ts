@@ -1,6 +1,7 @@
+
 // This file contains utility functions for interacting with Ethereum
 
-import { createVoteOnChain, castVoteOnChain, getActiveVotes, getVoteDetails, checkWalletConnection } from './contractUtils';
+import { createVoteOnChain, castVoteOnChain, getActiveVotes, getVoteDetails, checkWalletConnection } from '@/lib/contractUtils';
 import { toast } from "@/components/ui/use-toast";
 
 // Check if MetaMask is installed
