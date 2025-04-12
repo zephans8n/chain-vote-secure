@@ -65,42 +65,36 @@ async function main() {
       console.log("Could not update .env file:", error);
     }
     
-    // Generate the ABI and update the contractUtils.ts file
+    // Generate the ABI file from the artifact
     const artifactPath = path.join(__dirname, "../artifacts/contracts/VotingContract.sol/VotingContract.json");
     const contractArtifact = require(artifactPath);
     
-    // Save the ABI to a separate file for frontend use
-    const abiDir = path.join(__dirname, "../src/contracts");
-    if (!fs.existsSync(abiDir)) {
-      fs.mkdirSync(abiDir, { recursive: true });
-    }
-    
-    fs.writeFileSync(
-      path.join(abiDir, "VotingContractABI.json"),
-      JSON.stringify(contractArtifact.abi, null, 2)
-    );
-    
-    console.log("Contract ABI saved to src/contracts/VotingContractABI.json");
-    
-    // Update the contractUtils.ts file with the new contract address
-    const contractUtilsPath = path.join(__dirname, "../src/lib/contractUtils.ts");
-    
-    if (fs.existsSync(contractUtilsPath)) {
-      let contractUtils = fs.readFileSync(contractUtilsPath, "utf8");
+    // Update the frontend's contract utils with the new ABI and address
+    try {
+      const contractUtilsPath = path.join(__dirname, "../src/lib/contractUtils.ts");
       
-      // Replace the contract address placeholder with the actual address
-      contractUtils = contractUtils.replace(
-        /const CONTRACT_ADDRESS = ['"].*['"]/,
-        `const CONTRACT_ADDRESS = '${votingContract.address}'`
-      );
-      
-      // Write the updated file
-      fs.writeFileSync(contractUtilsPath, contractUtils);
-      
-      console.log(`Updated CONTRACT_ADDRESS in ${contractUtilsPath}`);
-    } else {
-      console.log(`Cannot find ${contractUtilsPath} to update contract address`);
-      console.log(`Please manually update CONTRACT_ADDRESS in your frontend code with: ${votingContract.address}`);
+      if (fs.existsSync(contractUtilsPath)) {
+        let contractUtils = fs.readFileSync(contractUtilsPath, "utf8");
+        
+        // Replace the contract address placeholder
+        contractUtils = contractUtils.replace(
+          /const CONTRACT_ADDRESS = ['"].*['"]/,
+          `const CONTRACT_ADDRESS = '${votingContract.address}'`
+        );
+        
+        // Replace the ABI placeholder
+        contractUtils = contractUtils.replace(
+          /const CONTRACT_ABI = \[\] as any;/,
+          `const CONTRACT_ABI = ${JSON.stringify(contractArtifact.abi, null, 2)} as any;`
+        );
+        
+        // Write the updated file
+        fs.writeFileSync(contractUtilsPath, contractUtils);
+        
+        console.log(`Updated CONTRACT_ADDRESS and ABI in ${contractUtilsPath}`);
+      }
+    } catch (error) {
+      console.log("Could not update contractUtils.ts:", error);
     }
 
     console.log("\n\x1b[32m%s\x1b[0m", "Deployment completed successfully!");

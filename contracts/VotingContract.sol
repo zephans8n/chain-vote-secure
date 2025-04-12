@@ -1,7 +1,11 @@
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.19;
 
+/**
+ * @title VotingContract
+ * @dev A contract for creating and managing decentralized votes
+ */
 contract VotingContract {
     struct Vote {
         uint256 id;
@@ -29,6 +33,15 @@ contract VotingContract {
     event VoteCreated(uint256 indexed voteId, string title, address indexed creator);
     event VoteCast(uint256 indexed voteId, uint256 optionId, address indexed voter);
 
+    /**
+     * @dev Create a new vote with multiple options
+     * @param _title Title of the vote
+     * @param _description Description of the vote
+     * @param _options Array of option texts
+     * @param _startTime Start time as Unix timestamp
+     * @param _endTime End time as Unix timestamp
+     * @return voteId ID of the created vote
+     */
     function createVote(
         string memory _title,
         string memory _description,
@@ -64,6 +77,11 @@ contract VotingContract {
         return voteId;
     }
     
+    /**
+     * @dev Cast a vote for a specific option
+     * @param _voteId ID of the vote
+     * @param _optionId ID of the option to vote for
+     */
     function castVote(uint256 _voteId, uint256 _optionId) public {
         require(_voteId < voteCount, "Vote does not exist");
         require(votes[_voteId].isActive, "Vote is not active");
@@ -79,6 +97,17 @@ contract VotingContract {
         emit VoteCast(_voteId, _optionId, msg.sender);
     }
     
+    /**
+     * @dev Get vote details
+     * @param _voteId ID of the vote
+     * @return title Title of the vote
+     * @return description Description of the vote
+     * @return creator Creator address
+     * @return startTime Start time
+     * @return endTime End time
+     * @return isActive Whether the vote is active
+     * @return totalVotes Total votes cast
+     */
     function getVoteDetails(uint256 _voteId) public view returns (
         string memory title,
         string memory description,
@@ -93,11 +122,23 @@ contract VotingContract {
         return (v.title, v.description, v.creator, v.startTime, v.endTime, v.isActive, v.totalVotes);
     }
     
+    /**
+     * @dev Get number of options for a vote
+     * @param _voteId ID of the vote
+     * @return Number of options
+     */
     function getVoteOptionsCount(uint256 _voteId) public view returns (uint256) {
         require(_voteId < voteCount, "Vote does not exist");
         return voteOptions[_voteId].length;
     }
     
+    /**
+     * @dev Get option details
+     * @param _voteId ID of the vote
+     * @param _optionId ID of the option
+     * @return text Option text
+     * @return voteCount Votes for this option
+     */
     function getVoteOption(uint256 _voteId, uint256 _optionId) public view returns (
         string memory text,
         uint256 voteCount
@@ -108,6 +149,10 @@ contract VotingContract {
         return (option.text, option.voteCount);
     }
     
+    /**
+     * @dev Get IDs of all active votes
+     * @return Array of active vote IDs
+     */
     function getActiveVoteIds() public view returns (uint256[] memory) {
         uint256 activeCount = 0;
         

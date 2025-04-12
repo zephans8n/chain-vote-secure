@@ -5,15 +5,12 @@ ChainVote is a decentralized voting application built on Ethereum that allows us
 
 ## Project Structure
 
-The project is organized into two main components:
-
-- **Frontend**: React application with TypeScript that provides the user interface
-- **Backend**: Solidity smart contracts that handle the voting logic on the blockchain
+The project is structured as a React frontend application that integrates with a smart contract on Ethereum:
 
 ```
 📦 ChainVote
- ┣ 📂 contracts         # Solidity smart contracts
- ┣ 📂 scripts           # Deployment and utility scripts
+ ┣ 📂 contracts         # Solidity smart contract (deployed separately)
+ ┣ 📂 scripts           # Deployment scripts for Hardhat
  ┣ 📂 test              # Smart contract tests
  ┣ 📂 src               # Frontend source code
  ┃ ┣ 📂 components      # React components
@@ -30,7 +27,32 @@ The project is organized into two main components:
 - Node.js (v18+ recommended)
 - npm or yarn
 - MetaMask extension installed in your browser
-- [Infura](https://infura.io/) account for deploying to Sepolia testnet
+- [Infura](https://infura.io/) account for testnet and mainnet connections
+
+## Smart Contract Requirements
+
+The ChainVote smart contract needs to implement the following functionality:
+
+1. **Vote Creation**:
+   - Create new votes with title, description, options, start time, and end time
+   - Require at least 2 voting options
+   - Store creator address
+
+2. **Vote Casting**:
+   - Allow users to cast votes for specific options
+   - Prevent double voting
+   - Check vote timing (can't vote before start time or after end time)
+
+3. **Vote Querying**:
+   - Get vote details (title, description, creator, timing, status)
+   - Get vote options and results
+   - Get list of active votes
+
+4. **Events**:
+   - Emit events when votes are created
+   - Emit events when votes are cast
+
+For detailed interface requirements, see `SMART_CONTRACT_REQUIREMENTS.md`
 
 ## Environment Setup
 
@@ -46,7 +68,7 @@ cp .env.example .env
    - Add your Infura API endpoints (especially for Sepolia)
    - Add your wallet private key (without 0x prefix)
    - Add your Etherscan API key for contract verification
-   - Don't worry about CONTRACT_ADDRESS, it will be filled automatically during deployment
+   - After deployment, update CONTRACT_ADDRESS with your deployed contract address
 
 ## Development Setup
 
@@ -56,104 +78,59 @@ cp .env.example .env
 npm install
 ```
 
-2. **Compile smart contracts**
+2. **Deploy your smart contract using Hardhat**
+
+Use separate terminal/command prompt to deploy your contract:
 
 ```bash
+# Compile smart contracts
 npx hardhat compile
-```
 
-3. **Run smart contract tests**
-
-```bash
+# Run smart contract tests
 npx hardhat test
+
+# Deploy to Sepolia testnet
+npx hardhat run scripts/deploy-sepolia.js --network sepolia
 ```
 
-4. **Start local blockchain**
+3. **Update the contract address**
 
-```bash
-npx hardhat node
-```
+After deployment, update your `.env` file with the contract address.
 
-5. **Deploy contracts to local blockchain** (in a new terminal)
-
-```bash
-npx hardhat run scripts/deploy.js --network localhost
-```
-
-6. **Start the frontend development server**
+4. **Start the frontend development server**
 
 ```bash
 npm run dev
 ```
 
-## Deployment to Sepolia Testnet
+## Using with different networks
 
-### Step 1: Smart Contract Deployment to Sepolia
+### Sepolia Testnet
 
-1. **Make sure your `.env` file is properly configured**:
-   - `SEPOLIA_URL` should be your Infura Sepolia endpoint (https://sepolia.infura.io/v3/your-project-id)
-   - `PRIVATE_KEY` should be your wallet private key (without 0x prefix)
-   - `ETHERSCAN_API_KEY` should be your Etherscan API key
-
-2. **Deploy to Sepolia testnet**:
+1. **Deploy to Sepolia testnet**:
 
 ```bash
-npx hardhat run scripts/deploy.js --network sepolia
+npx hardhat run scripts/deploy-sepolia.js --network sepolia
 ```
 
-3. **Verify contract on Etherscan**:
+2. **Verify contract on Etherscan**:
 
 ```bash
 npx hardhat verify --network sepolia DEPLOYED_CONTRACT_ADDRESS
 ```
 
-### Step 2: Testing on Sepolia
+3. **Get test ETH** from the [Sepolia faucet](https://sepolia-faucet.pk910.de/)
 
-1. **Get test ETH** from the [Sepolia faucet](https://sepolia-faucet.pk910.de/)
+4. Make sure to connect MetaMask to Sepolia network when testing
 
-2. **Test your application with MetaMask**:
-   - Add the Sepolia network to MetaMask if not already added
-   - Connect your application to the Sepolia network
-   - Create and cast votes to ensure everything works correctly
+## Frontend Development
 
-3. **Monitor your contract** on [Sepolia Etherscan](https://sepolia.etherscan.io/)
+The frontend is a React application that interacts with the deployed smart contract. To develop the frontend:
 
-### Step 3: Frontend Deployment
-
-1. **Build the frontend**:
-
-```bash
-npm run build
-```
-
-2. **Deploy to your preferred hosting service** (Netlify, Vercel, etc.)
-
-## Additional Hardhat Commands
-
-```bash
-# Get Sepolia network info
-npx hardhat network --network sepolia
-
-# Get account balances on Sepolia
-npx hardhat accounts --network sepolia
-
-# Generate TypeScript types from ABI
-npx hardhat typechain
-
-# Get help with Hardhat
-npx hardhat help
-```
-
-## Optimization Tips
-
-- **Gas Optimization**: The contract has been designed with gas efficiency in mind
-- **Security**: Basic security practices have been implemented, but consider a professional audit before mainnet deployment
-- **Sepolia Testnet**: Ideal for testing before moving to mainnet
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+1. Make sure the contract is deployed and the address is updated in your environment
+2. Connect MetaMask wallet to interact with the contract
+3. Use the provided utility functions in `src/lib/web3.ts` to interact with the contract
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License.
