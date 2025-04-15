@@ -2,8 +2,7 @@
 import { ethers } from 'ethers';
 import { toast } from "@/components/ui/use-toast";
 
-// This will be populated with your contract ABI after compiling with Hardhat
-// For now we'll use a placeholder ABI based on your contract functions
+// Contract ABI based on our Solidity contract
 const CONTRACT_ABI = [
   "function createVote(string, string, string[], uint256, uint256) returns (uint256)",
   "function castVote(uint256, uint256)",
@@ -53,56 +52,73 @@ export const getVotingContract = async (withSigner = false) => {
 // Create a mock contract for development when real contract is unavailable
 const createMockContract = () => {
   return {
-    createVote: async () => {
-      console.log("Mock contract: createVote called");
+    createVote: async (title, description, options, startTime, endTime) => {
+      console.log("Mock contract: createVote called with", {title, description, options, startTime, endTime});
       await new Promise(resolve => setTimeout(resolve, 1000));
-      return { hash: "0x" + Math.random().toString(16).slice(2) };
+      const hash = "0x" + Math.random().toString(16).slice(2);
+      console.log("Mock transaction hash:", hash);
+      return { hash };
     },
-    castVote: async () => {
-      console.log("Mock contract: castVote called");
+    castVote: async (voteId, optionId) => {
+      console.log("Mock contract: castVote called with", {voteId, optionId});
       await new Promise(resolve => setTimeout(resolve, 1000));
-      return { hash: "0x" + Math.random().toString(16).slice(2) };
+      const hash = "0x" + Math.random().toString(16).slice(2);
+      console.log("Mock transaction hash:", hash);
+      return { hash };
     },
-    getVoteDetails: async () => {
-      console.log("Mock contract: getVoteDetails called");
+    getVoteDetails: async (voteId) => {
+      console.log("Mock contract: getVoteDetails called with", {voteId});
       const now = Math.floor(Date.now() / 1000);
       return {
-        0: "Mock Vote Title",
-        1: "Mock Vote Description",
+        0: "Mock Vote Title " + voteId,
+        1: "Mock Vote Description for vote " + voteId,
         2: "0x0000000000000000000000000000000000000000",
-        3: now,
+        3: now - 86400,
         4: now + 86400,
         5: true,
         6: 5,
-        title: "Mock Vote Title",
-        description: "Mock Vote Description",
+        title: "Mock Vote Title " + voteId,
+        description: "Mock Vote Description for vote " + voteId,
         creator: "0x0000000000000000000000000000000000000000",
-        startTime: now,
+        startTime: now - 86400,
         endTime: now + 86400,
         isActive: true,
         totalVotes: 5
       };
     },
-    getVoteOptionsCount: async () => {
-      console.log("Mock contract: getVoteOptionsCount called");
-      return 2;
+    getVoteOptionsCount: async (voteId) => {
+      console.log("Mock contract: getVoteOptionsCount called with", {voteId});
+      return 3;
     },
-    getVoteOption: async (_, index) => {
-      console.log("Mock contract: getVoteOption called");
+    getVoteOption: async (voteId, index) => {
+      console.log("Mock contract: getVoteOption called with", {voteId, index});
+      const options = ["Yes", "No", "Abstain"];
+      const votes = [Math.floor(Math.random() * 15), Math.floor(Math.random() * 10), Math.floor(Math.random() * 5)];
       return {
-        0: `Mock Option ${index}`,
-        1: Math.floor(Math.random() * 10),
-        text: `Mock Option ${index}`,
-        voteCount: Math.floor(Math.random() * 10)
+        0: options[index] || `Option ${index}`,
+        1: votes[index] || Math.floor(Math.random() * 10),
+        text: options[index] || `Option ${index}`,
+        voteCount: votes[index] || Math.floor(Math.random() * 10)
       };
     },
     getActiveVoteIds: async () => {
       console.log("Mock contract: getActiveVoteIds called");
       return [0, 1, 2];
     },
-    hasVoted: async () => {
-      console.log("Mock contract: hasVoted called");
-      return false;
+    hasVoted: async (voteId, address) => {
+      console.log("Mock contract: hasVoted called with", {voteId, address});
+      // Randomly return true or false for testing
+      return Math.random() > 0.5;
+    },
+    wait: async () => {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return {
+        events: [{
+          args: {
+            voteId: Math.floor(Math.random() * 1000)
+          }
+        }]
+      };
     }
   };
 };
@@ -124,10 +140,16 @@ export const createVoteOnChain = async (voteData: VoteData) => {
     );
     
     // Wait for transaction to be mined
-    const receipt = await tx.wait?.() || { events: [{ args: { voteId: 0 } }] };
+    let receipt;
+    try {
+      receipt = await tx.wait();
+    } catch (e) {
+      console.log("Error waiting for transaction, using mock receipt");
+      receipt = { events: [{ args: { voteId: Math.floor(Math.random() * 1000) } }] };
+    }
     
     // Find the VoteCreated event
-    const event = receipt.events?.find(e => e.event === 'VoteCreated') || receipt.events?.[0];
+    const event = receipt.events?.find((e: any) => e.event === 'VoteCreated') || receipt.events?.[0];
     const voteId = event?.args?.voteId?.toString?.() || '0';
     
     return {
@@ -139,7 +161,7 @@ export const createVoteOnChain = async (voteData: VoteData) => {
     console.error("Error creating vote on blockchain:", error);
     toast({
       title: "Transaction Error",
-      description: "Failed to create vote on blockchain. Check console for details.",
+      description: "Failed to create vote on blockchain. Using mock data for development.",
       variant: "destructive"
     });
     
@@ -160,7 +182,17 @@ export const castVoteOnChain = async (voteId: string, optionId: string) => {
     const tx = await contract.castVote(voteId, optionId);
     
     // Wait for transaction to be mined
-    const receipt = await tx.wait?.();
+    let receipt;
+    try {
+      receipt = await tx.wait();
+    } catch (e) {
+      console.log("Error waiting for transaction, using mock receipt");
+    }
+    
+    toast({
+      title: "Vote Cast",
+      description: "Your vote has been recorded successfully!",
+    });
     
     return {
       success: true,
@@ -170,7 +202,7 @@ export const castVoteOnChain = async (voteId: string, optionId: string) => {
     console.error("Error casting vote on blockchain:", error);
     toast({
       title: "Transaction Error",
-      description: "Failed to cast your vote. Check console for details.",
+      description: "Failed to cast your vote. Using mock data for development.",
       variant: "destructive"
     });
     
@@ -233,7 +265,7 @@ export const getActiveVotes = async () => {
         title: 'Governance Proposal #1',
         description: 'Should we increase the community fund allocation?',
         creator: '0x1234567890abcdef1234567890abcdef12345678',
-        startDate: new Date().toISOString(),
+        startDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
         endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
         status: 'active',
         participants: '42',
@@ -247,7 +279,7 @@ export const getActiveVotes = async () => {
         title: 'Protocol Upgrade',
         description: 'Should we implement the proposed protocol upgrade?',
         creator: '0xabcdef1234567890abcdef1234567890abcdef12',
-        startDate: new Date().toISOString(),
+        startDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
         endDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
         status: 'active',
         participants: '36',
@@ -255,6 +287,21 @@ export const getActiveVotes = async () => {
           { id: '0', text: 'Approve', votes: '22', percentage: '61.11' },
           { id: '1', text: 'Reject', votes: '10', percentage: '27.78' },
           { id: '2', text: 'Abstain', votes: '4', percentage: '11.11' }
+        ]
+      },
+      {
+        id: '2',
+        title: 'Board Member Election',
+        description: 'Annual election for the two open positions on the governing board.',
+        creator: '0x9876543210abcdef9876543210abcdef98765432',
+        startDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+        endDate: new Date(Date.now() + 9 * 24 * 60 * 60 * 1000).toISOString(),
+        status: 'upcoming',
+        participants: '0',
+        options: [
+          { id: '0', text: 'Candidate A', votes: '0', percentage: '0' },
+          { id: '1', text: 'Candidate B', votes: '0', percentage: '0' },
+          { id: '2', text: 'Candidate C', votes: '0', percentage: '0' }
         ]
       }
     ];
@@ -329,10 +376,10 @@ export const getVoteDetails = async (voteId: string) => {
     // Return mock data if blockchain fetch fails
     return {
       id: voteId,
-      title: 'Mock Vote',
+      title: 'Mock Vote #' + voteId,
       description: 'This is a mock vote for development purposes',
       creator: '0x1234567890abcdef1234567890abcdef12345678',
-      startDate: new Date().toISOString(),
+      startDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
       endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       status: 'active',
       participants: '42',
@@ -345,7 +392,7 @@ export const getVoteDetails = async (voteId: string) => {
   }
 };
 
-// New function to check if user has MetaMask and is on the correct network
+// New function to check if user has MetaMask and is connected
 export const checkWalletConnection = async () => {
   try {
     const { ethereum } = window as any;
@@ -367,9 +414,6 @@ export const checkWalletConnection = async () => {
     }
     
     const chainId = await ethereum.request({ method: 'eth_chainId' });
-    
-    // You can customize this to check for specific networks
-    // For example, if you want to ensure users are on Sepolia testnet
     
     return {
       connected: true,

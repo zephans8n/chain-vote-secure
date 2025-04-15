@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import CreateVote from "./pages/CreateVote";
 import NotFound from "./pages/NotFound";
 import VotesList from "./pages/VotesList";
+import VoteDetails from "./pages/VoteDetails";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,7 +28,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/votes" element={<VotesList />} />
-            <Route path="/votes/:id" element={<Index />} /> {/* We'll keep this as is for now */}
+            <Route path="/votes/:id" element={<VoteDetails />} /> 
             <Route path="/create" element={<CreateVote />} /> 
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

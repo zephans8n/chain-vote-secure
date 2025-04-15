@@ -27,23 +27,6 @@ export const connectWallet = async (): Promise<string> => {
       throw new Error("No accounts found. Please create an account in MetaMask.");
     }
     
-    // Listen for account changes
-    ethereum.on('accountsChanged', (newAccounts: string[]) => {
-      if (newAccounts.length === 0) {
-        // User disconnected their wallet
-        window.location.reload();
-      } else {
-        // Account changed, reload the page to refresh state
-        window.location.reload();
-      }
-    });
-    
-    // Listen for network changes
-    ethereum.on('chainChanged', () => {
-      // Network changed, reload the page to refresh state
-      window.location.reload();
-    });
-    
     console.log("Wallet connected:", accounts[0]);
     
     // Return the first account
@@ -131,25 +114,6 @@ export const switchToCorrectNetwork = async (requiredChainId: string) => {
   }
 };
 
-// Get transaction receipt
-export const getTransactionReceipt = async (txHash: string) => {
-  try {
-    const { ethereum } = window as any;
-    
-    if (!ethereum) {
-      throw new Error("MetaMask is not installed");
-    }
-    
-    return await ethereum.request({
-      method: 'eth_getTransactionReceipt',
-      params: [txHash],
-    });
-  } catch (error) {
-    console.error("Error getting transaction receipt:", error);
-    throw error;
-  }
-};
-
 // Create a new vote using the smart contract
 export const createVote = async (voteData: any) => {
   try {
@@ -205,38 +169,6 @@ export const fetchVoteDetails = async (voteId: string) => {
     console.error("Error fetching vote details:", error);
     // Return null if blockchain fetch fails
     return null;
-  }
-};
-
-// Function to verify if a transaction was successful
-export const verifyTransaction = async (txHash: string) => {
-  try {
-    const receipt = await getTransactionReceipt(txHash);
-    
-    if (!receipt) {
-      return {
-        confirmed: false,
-        message: "Transaction is still pending"
-      };
-    }
-    
-    if (receipt.status === 1 || receipt.status === '0x1') {
-      return {
-        confirmed: true,
-        message: "Transaction was successful"
-      };
-    } else {
-      return {
-        confirmed: false,
-        message: "Transaction failed"
-      };
-    }
-  } catch (error) {
-    console.error("Error verifying transaction:", error);
-    return {
-      confirmed: false,
-      message: "Error checking transaction status"
-    };
   }
 };
 

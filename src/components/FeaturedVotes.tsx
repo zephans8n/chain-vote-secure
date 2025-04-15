@@ -8,40 +8,6 @@ import { Link } from "react-router-dom";
 import { fetchActiveVotes } from "@/lib/web3";
 import { Vote } from "@/lib/interfaces";
 
-// Fallback mock data in case blockchain fetch fails
-const mockVotes = [
-  {
-    id: "1",
-    title: "Community Fund Allocation",
-    description: "Vote on how to distribute the community development fund for Q2 2025.",
-    organization: "DAO Treasury",
-    participants: 234,
-    deadline: "2025-04-25",
-    status: "active",
-    daysLeft: 14
-  },
-  {
-    id: "2",
-    title: "Protocol Upgrade Proposal",
-    description: "Vote on implementing the new security features in the next protocol version.",
-    organization: "Tech Governance",
-    participants: 412,
-    deadline: "2025-04-20",
-    status: "active",
-    daysLeft: 9
-  },
-  {
-    id: "3",
-    title: "Board Member Election",
-    description: "Annual election for the two open positions on the governing board.",
-    organization: "DAO Management",
-    participants: 189,
-    deadline: "2025-05-01",
-    status: "upcoming",
-    daysLeft: 21
-  }
-];
-
 const FeaturedVotes = () => {
   const [votes, setVotes] = useState<Vote[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -55,13 +21,13 @@ const FeaturedVotes = () => {
         if (activeVotes && activeVotes.length > 0) {
           setVotes(activeVotes);
         } else {
-          // Fallback to mock data if no votes are returned
-          setVotes(mockVotes as unknown as Vote[]);
+          setVotes([]);
+          setError("No active votes found");
         }
       } catch (err) {
         console.error("Error loading votes:", err);
         setError("Failed to load votes from blockchain");
-        setVotes(mockVotes as unknown as Vote[]);
+        setVotes([]);
       } finally {
         setIsLoading(false);
       }
@@ -88,9 +54,9 @@ const FeaturedVotes = () => {
             Explore active and upcoming votes from various organizations and communities.
             {isLoading ? " Loading..." : ""}
           </p>
-          {error && (
-            <p className="text-red-500 mt-2">
-              {error} - Using mock data instead
+          {error && votes.length === 0 && (
+            <p className="text-amber-600 mt-2">
+              {error}
             </p>
           )}
         </div>
@@ -116,25 +82,29 @@ const FeaturedVotes = () => {
               </Card>
             ))}
           </div>
+        ) : votes.length === 0 ? (
+          <div className="text-center py-16 bg-white rounded-lg shadow-sm">
+            <h3 className="text-xl font-medium mb-2">No Active Votes</h3>
+            <p className="text-gray-500 mb-6">There are currently no active votes available.</p>
+            <Link to="/create">
+              <Button>Create New Vote</Button>
+            </Link>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {votes.map((vote) => {
+            {votes.slice(0, 3).map((vote) => {
               const daysLeft = calculateDaysLeft(vote.endDate);
               
               return (
-                <Card key={vote.id} className="card-hover">
+                <Card key={vote.id} className="hover:shadow-md transition-shadow">
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <CardTitle className="text-xl">{vote.title}</CardTitle>
-                      <Badge variant={vote.status === 'active' ? 'default' : 'outline'} className={
-                        vote.status === 'active' 
-                          ? 'bg-voting-primary hover:bg-voting-primary/90'
-                          : ''
-                      }>
+                      <Badge variant={vote.status === 'active' ? 'default' : 'outline'}>
                         {vote.status === 'active' ? 'Active' : 'Upcoming'}
                       </Badge>
                     </div>
-                    <CardDescription>{vote.description}</CardDescription>
+                    <CardDescription className="line-clamp-2">{vote.description}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
@@ -154,7 +124,7 @@ const FeaturedVotes = () => {
                   </CardContent>
                   <CardFooter className="flex justify-between">
                     <Link to={`/votes/${vote.id}`}>
-                      <Button variant="outline" className="text-voting-primary">
+                      <Button variant="outline">
                         View Details
                         <ExternalLink className="ml-2 h-4 w-4" />
                       </Button>
@@ -166,14 +136,16 @@ const FeaturedVotes = () => {
           </div>
         )}
 
-        <div className="text-center mt-12">
-          <Button asChild>
-            <Link to="/votes">
-              View All Votes
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
+        {votes.length > 0 && (
+          <div className="text-center mt-12">
+            <Button asChild>
+              <Link to="/votes">
+                View All Votes
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        )}
       </div>
     </section>
   );

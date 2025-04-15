@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { Wallet, AlertTriangle, LogOut } from 'lucide-react';
+import { Wallet, AlertTriangle, LogOut, ChevronDown } from 'lucide-react';
 import { useWallet } from '@/hooks/useWallet';
 import {
   DropdownMenu,
@@ -27,11 +27,7 @@ const ConnectWallet = ({ isMobile = false }: ConnectWalletProps) => {
     
     setIsConnecting(true);
     try {
-      const walletAddress = await connect();
-      toast({
-        title: "Wallet Connected",
-        description: `Connected: ${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`,
-      });
+      await connect();
     } catch (error) {
       // Error already handled in the hook
     } finally {
@@ -42,17 +38,8 @@ const ConnectWallet = ({ isMobile = false }: ConnectWalletProps) => {
   const handleDisconnect = async () => {
     try {
       await disconnect();
-      toast({
-        title: "Wallet Disconnected",
-        description: "Your wallet has been disconnected",
-      });
     } catch (error) {
       console.error("Error disconnecting wallet:", error);
-      toast({
-        title: "Error",
-        description: "Failed to disconnect wallet",
-        variant: "destructive",
-      });
     }
   };
 
@@ -84,13 +71,24 @@ const ConnectWallet = ({ isMobile = false }: ConnectWalletProps) => {
             <Button variant="outline" className="w-full">
               <Wallet className="mr-2 h-4 w-4" />
               {formatAddress(address)}
+              <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>Wallet</DropdownMenuLabel>
-            {networkName && <DropdownMenuItem className="text-xs text-gray-500">{networkName}</DropdownMenuItem>}
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleDisconnect} className="text-red-600">
+            <DropdownMenuItem className="flex justify-between">
+              <span>Address</span>
+              <span className="text-xs font-mono">{formatAddress(address)}</span>
+            </DropdownMenuItem>
+            {networkName && (
+              <DropdownMenuItem className="flex justify-between">
+                <span>Network</span>
+                <span className="text-xs">{networkName}</span>
+              </DropdownMenuItem>
+            )}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleDisconnect} className="text-red-600 cursor-pointer">
               <LogOut className="mr-2 h-4 w-4" />
               Disconnect
             </DropdownMenuItem>
@@ -102,7 +100,7 @@ const ConnectWallet = ({ isMobile = false }: ConnectWalletProps) => {
     return (
       <Button 
         onClick={handleConnect}
-        className="w-full btn-gradient"
+        className="w-full bg-blue-600 hover:bg-blue-700"
         variant="default"
         disabled={isLoading || isConnecting}
       >
@@ -125,13 +123,24 @@ const ConnectWallet = ({ isMobile = false }: ConnectWalletProps) => {
           <Button variant="outline" className="min-w-[180px]">
             <Wallet className="mr-2 h-4 w-4" />
             {formatAddress(address)}
+            <ChevronDown className="ml-2 h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Wallet</DropdownMenuLabel>
-          {networkName && <DropdownMenuItem className="text-xs text-gray-500">{networkName}</DropdownMenuItem>}
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuLabel>Connected Wallet</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleDisconnect} className="text-red-600">
+          <DropdownMenuItem className="flex justify-between">
+            <span>Address</span>
+            <span className="text-xs font-mono">{formatAddress(address)}</span>
+          </DropdownMenuItem>
+          {networkName && (
+            <DropdownMenuItem className="flex justify-between">
+              <span>Network</span>
+              <span className="text-xs">{networkName}</span>
+            </DropdownMenuItem>
+          )}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleDisconnect} className="text-red-600 cursor-pointer">
             <LogOut className="mr-2 h-4 w-4" />
             Disconnect
           </DropdownMenuItem>
@@ -143,7 +152,7 @@ const ConnectWallet = ({ isMobile = false }: ConnectWalletProps) => {
   return (
     <Button 
       onClick={handleConnect}
-      className="btn-gradient"
+      className="bg-blue-600 hover:bg-blue-700"
       variant="default"
       disabled={isLoading || isConnecting}
     >

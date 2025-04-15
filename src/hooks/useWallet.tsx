@@ -53,6 +53,10 @@ export function useWallet() {
               chainId: undefined,
               networkName: undefined,
             });
+            toast({
+              title: "Wallet Disconnected",
+              description: "Your wallet has been disconnected",
+            });
           } else {
             // Account changed
             setWalletState(prev => ({
@@ -60,17 +64,26 @@ export function useWallet() {
               address: accounts[0],
               isConnected: true,
             }));
+            toast({
+              title: "Account Changed",
+              description: `Connected to: ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`,
+            });
           }
         };
         
-        const handleChainChanged = async () => {
+        const handleChainChanged = async (chainId: string) => {
           const networkName = await getCurrentNetwork();
-          const chainId = await ethereum.request({ method: 'eth_chainId' });
           setWalletState(prev => ({
             ...prev,
             chainId,
             networkName,
           }));
+          toast({
+            title: "Network Changed",
+            description: `Connected to: ${networkName}`,
+          });
+          // Reload the page to refresh the app state with the new network
+          window.location.reload();
         };
         
         ethereum.on('accountsChanged', handleAccountsChanged);
@@ -87,7 +100,7 @@ export function useWallet() {
     } else {
       setIsLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   // Connect wallet function
   const connect = async () => {
@@ -103,6 +116,11 @@ export function useWallet() {
         isConnected: true,
         chainId,
         networkName,
+      });
+      
+      toast({
+        title: "Wallet Connected",
+        description: `Connected: ${address.slice(0, 6)}...${address.slice(-4)}`,
       });
       
       return address;
@@ -132,12 +150,22 @@ export function useWallet() {
         networkName: undefined,
       });
       
+      toast({
+        title: "Wallet Disconnected",
+        description: "Your wallet has been disconnected",
+      });
+      
       // Force page reload to reset any cached states
       window.location.reload();
       
       return true;
     } catch (error) {
       console.error("Error disconnecting wallet:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to disconnect wallet",
+      });
       throw error;
     } finally {
       setIsLoading(false);
