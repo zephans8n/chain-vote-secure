@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchVoteDetails, castVote } from '@/lib/web3';
@@ -20,6 +19,7 @@ import {
   User,
   AlertCircle
 } from 'lucide-react';
+import VoteGraph from '@/components/VoteGraph';
 
 const VoteDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -243,18 +243,17 @@ const VoteDetails = () => {
 
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>Vote Options</CardTitle>
+            <CardTitle>Vote Results</CardTitle>
             <CardDescription>
               {hasVoted
-                ? "You have already cast your vote."
+                ? "Current voting results"
                 : canVote
-                  ? "Select an option and submit your vote."
+                  ? "Select an option and submit your vote"
                   : isActive
-                    ? "Connect your wallet to vote."
+                    ? "Connect your wallet to vote"
                     : voteData.status === 'upcoming'
-                      ? "Voting hasn't started yet."
-                      : "Voting has ended."
-              }
+                      ? "Voting hasn't started yet"
+                      : "Final voting results"}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -274,21 +273,24 @@ const VoteDetails = () => {
                     ))}
                   </RadioGroup>
                 ) : (
-                  <div className="space-y-4">
-                    {voteData.options.map((option: any) => (
-                      <div key={option.id} className="space-y-2">
-                        <div className="flex justify-between">
-                          <span>{option.text}</span>
-                          <span className="font-semibold">{option.percentage}%</span>
+                  <>
+                    <VoteGraph options={voteData.options} />
+                    <div className="space-y-4 mt-6">
+                      {voteData.options.map((option: any) => (
+                        <div key={option.id} className="space-y-2">
+                          <div className="flex justify-between">
+                            <span>{option.text}</span>
+                            <span className="font-semibold">{option.percentage}%</span>
+                          </div>
+                          <Progress value={Number(option.percentage)} className="h-2" />
+                          <div className="text-sm text-gray-500">
+                            {option.votes} vote{parseInt(option.votes) !== 1 ? 's' : ''}
+                          </div>
+                          <Separator className="my-2" />
                         </div>
-                        <Progress value={Number(option.percentage)} className="h-2" />
-                        <div className="text-sm text-gray-500">
-                          {option.votes} vote{parseInt(option.votes) !== 1 ? 's' : ''}
-                        </div>
-                        <Separator className="my-2" />
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  </>
                 )}
                 
                 {canVote && (
