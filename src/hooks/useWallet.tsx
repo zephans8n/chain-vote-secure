@@ -119,10 +119,36 @@ export function useWallet() {
     }
   };
 
+  // Disconnect wallet function
+  const disconnect = async () => {
+    try {
+      setIsLoading(true);
+      
+      // MetaMask doesn't have a disconnect method, so we'll just clear the state
+      setWalletState({
+        address: null,
+        isConnected: false,
+        chainId: undefined,
+        networkName: undefined,
+      });
+      
+      // Force page reload to reset any cached states
+      window.location.reload();
+      
+      return true;
+    } catch (error) {
+      console.error("Error disconnecting wallet:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     ...walletState,
     isLoading,
     connect,
+    disconnect,
     isMetaMaskInstalled: isMetaMaskInstalled(),
   };
 }

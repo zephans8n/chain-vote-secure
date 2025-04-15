@@ -2,15 +2,23 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { Wallet, AlertTriangle } from 'lucide-react';
+import { Wallet, AlertTriangle, LogOut } from 'lucide-react';
 import { useWallet } from '@/hooks/useWallet';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface ConnectWalletProps {
   isMobile?: boolean;
 }
 
 const ConnectWallet = ({ isMobile = false }: ConnectWalletProps) => {
-  const { address, isConnected, networkName, isLoading, connect, isMetaMaskInstalled } = useWallet();
+  const { address, isConnected, networkName, isLoading, connect, disconnect, isMetaMaskInstalled } = useWallet();
   const [isConnecting, setIsConnecting] = useState(false);
   const { toast } = useToast();
 
@@ -28,6 +36,23 @@ const ConnectWallet = ({ isMobile = false }: ConnectWalletProps) => {
       // Error already handled in the hook
     } finally {
       setIsConnecting(false);
+    }
+  };
+
+  const handleDisconnect = async () => {
+    try {
+      await disconnect();
+      toast({
+        title: "Wallet Disconnected",
+        description: "Your wallet has been disconnected",
+      });
+    } catch (error) {
+      console.error("Error disconnecting wallet:", error);
+      toast({
+        title: "Error",
+        description: "Failed to disconnect wallet",
+        variant: "destructive",
+      });
     }
   };
 
@@ -50,12 +75,35 @@ const ConnectWallet = ({ isMobile = false }: ConnectWalletProps) => {
     );
   }
 
+  // If on mobile
   if (isMobile) {
+    if (address) {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="w-full">
+              <Wallet className="mr-2 h-4 w-4" />
+              {formatAddress(address)}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuLabel>Wallet</DropdownMenuLabel>
+            {networkName && <DropdownMenuItem className="text-xs text-gray-500">{networkName}</DropdownMenuItem>}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleDisconnect} className="text-red-600">
+              <LogOut className="mr-2 h-4 w-4" />
+              Disconnect
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    }
+
     return (
       <Button 
         onClick={handleConnect}
-        className={`w-full ${address ? "" : "btn-gradient"}`}
-        variant={address ? "outline" : "default"}
+        className="w-full btn-gradient"
+        variant="default"
         disabled={isLoading || isConnecting}
       >
         <Wallet className="mr-2 h-4 w-4" />
@@ -63,36 +111,50 @@ const ConnectWallet = ({ isMobile = false }: ConnectWalletProps) => {
           ? "Loading..." 
           : isConnecting 
             ? "Connecting..." 
-            : address 
-              ? formatAddress(address) 
-              : "Connect Wallet"
+            : "Connect Wallet"
         }
       </Button>
     );
   }
 
+  // Desktop version
+  if (address) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" className="min-w-[180px]">
+            <Wallet className="mr-2 h-4 w-4" />
+            {formatAddress(address)}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Wallet</DropdownMenuLabel>
+          {networkName && <DropdownMenuItem className="text-xs text-gray-500">{networkName}</DropdownMenuItem>}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleDisconnect} className="text-red-600">
+            <LogOut className="mr-2 h-4 w-4" />
+            Disconnect
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
+
   return (
-    <div className="flex flex-col">
-      <Button 
-        onClick={handleConnect}
-        className={address ? "" : "btn-gradient"}
-        variant={address ? "outline" : "default"}
-        disabled={isLoading || isConnecting}
-      >
-        <Wallet className="mr-2 h-4 w-4" />
-        {isLoading 
-          ? "Loading..." 
-          : isConnecting 
-            ? "Connecting..." 
-            : address 
-              ? formatAddress(address) 
-              : "Connect Wallet"
-        }
-      </Button>
-      {address && networkName && (
-        <span className="text-xs text-gray-500 mt-1 text-center">{networkName}</span>
-      )}
-    </div>
+    <Button 
+      onClick={handleConnect}
+      className="btn-gradient"
+      variant="default"
+      disabled={isLoading || isConnecting}
+    >
+      <Wallet className="mr-2 h-4 w-4" />
+      {isLoading 
+        ? "Loading..." 
+        : isConnecting 
+          ? "Connecting..." 
+          : "Connect Wallet"
+      }
+    </Button>
   );
 };
 

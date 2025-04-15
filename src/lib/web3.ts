@@ -23,6 +23,10 @@ export const connectWallet = async (): Promise<string> => {
     // Request account access
     const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
     
+    if (!accounts || accounts.length === 0) {
+      throw new Error("No accounts found. Please create an account in MetaMask.");
+    }
+    
     // Listen for account changes
     ethereum.on('accountsChanged', (newAccounts: string[]) => {
       if (newAccounts.length === 0) {
@@ -40,11 +44,19 @@ export const connectWallet = async (): Promise<string> => {
       window.location.reload();
     });
     
+    console.log("Wallet connected:", accounts[0]);
+    
     // Return the first account
     return accounts[0];
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error connecting wallet:", error);
-    throw new Error("Failed to connect wallet. Please try again.");
+    
+    // Handle user rejected request error
+    if (error.code === 4001) {
+      throw new Error("Connection rejected. Please approve the connection request.");
+    }
+    
+    throw new Error(error.message || "Failed to connect wallet. Please try again.");
   }
 };
 
@@ -69,13 +81,14 @@ export const getCurrentNetwork = async (): Promise<string> => {
       '0x89': 'Polygon Mainnet',
       '0x13881': 'Mumbai Testnet',
       '0xa86a': 'Avalanche Mainnet',
-      '0xa869': 'Avalanche Testnet'
+      '0xa869': 'Avalanche Testnet',
+      '0xaa36a7': 'Sepolia Testnet'
     };
     
     return networks[chainId] || `Chain ID: ${chainId}`;
   } catch (error) {
     console.error("Error getting network:", error);
-    throw error;
+    return "Unknown Network";
   }
 };
 
@@ -140,49 +153,41 @@ export const getTransactionReceipt = async (txHash: string) => {
 // Create a new vote using the smart contract
 export const createVote = async (voteData: any) => {
   try {
+    console.log("Creating vote with data:", voteData);
     return await createVoteOnChain(voteData);
   } catch (error) {
     console.error("Error creating vote:", error);
+    toast({
+      title: "Error Creating Vote",
+      description: error instanceof Error ? error.message : "An unknown error occurred",
+      variant: "destructive"
+    });
     
-    // Fallback to mock implementation for development
-    console.log("Using mock implementation instead");
-    console.log("Creating vote with data:", voteData);
-    
-    // Simulate transaction delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    return {
-      success: true,
-      transactionHash: "0x" + Math.random().toString(16).slice(2, 10) + Math.random().toString(16).slice(2, 10),
-      voteId: Math.floor(Math.random() * 1000).toString()
-    };
+    throw error;
   }
 };
 
 // Cast a vote using the smart contract
 export const castVote = async (voteId: string, option: string) => {
   try {
+    console.log(`Casting vote for option ${option} in vote ${voteId}`);
     return await castVoteOnChain(voteId, option);
   } catch (error) {
     console.error("Error casting vote:", error);
+    toast({
+      title: "Error Casting Vote",
+      description: error instanceof Error ? error.message : "An unknown error occurred",
+      variant: "destructive"
+    });
     
-    // Fallback to mock implementation for development
-    console.log(`Using mock implementation instead`);
-    console.log(`Casting vote for option ${option} in vote ${voteId}`);
-    
-    // Simulate transaction delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    return {
-      success: true,
-      transactionHash: "0x" + Math.random().toString(16).slice(2, 10) + Math.random().toString(16).slice(2, 10)
-    };
+    throw error;
   }
 };
 
 // Fetch active votes from the blockchain
 export const fetchActiveVotes = async () => {
   try {
+    console.log("Fetching active votes");
     return await getActiveVotes();
   } catch (error) {
     console.error("Error fetching active votes:", error);
@@ -194,6 +199,7 @@ export const fetchActiveVotes = async () => {
 // Fetch vote details from the blockchain
 export const fetchVoteDetails = async (voteId: string) => {
   try {
+    console.log(`Fetching details for vote ${voteId}`);
     return await getVoteDetails(voteId);
   } catch (error) {
     console.error("Error fetching vote details:", error);
