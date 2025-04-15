@@ -1,8 +1,7 @@
-
 import { ethers } from 'ethers';
 import { toast } from "@/components/ui/use-toast";
 
-// Contract ABI based on our Solidity contract
+// Contract ABI - Copy this from Remix IDE after compilation
 const CONTRACT_ABI = [
   "function createVote(string, string, string[], uint256, uint256) returns (uint256)",
   "function castVote(uint256, uint256)",
@@ -13,8 +12,7 @@ const CONTRACT_ABI = [
   "function hasVoted(uint256, address) view returns (bool)"
 ];
 
-// In a real deployment, replace this with your actual contract address
-// For development purposes we'll use a placeholder that works with mock implementations
+// Replace this with your deployed contract address from Remix IDE
 const CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 export interface VoteData {
@@ -44,7 +42,6 @@ export const getVotingContract = async (withSigner = false) => {
     return new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
   } catch (error) {
     console.error("Error getting contract instance:", error);
-    // For development, return a mock contract with the expected methods
     return createMockContract();
   }
 };
