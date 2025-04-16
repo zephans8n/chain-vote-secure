@@ -1,16 +1,19 @@
-
 import { ethers } from 'ethers';
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 // Contract ABI - Copy this from Remix IDE after compilation
 const CONTRACT_ABI = [
   "function createVote(string, string, string[], uint256, uint256) returns (uint256)",
   "function castVote(uint256, uint256)",
+  "function closeVote(uint256)",
   "function getVoteDetails(uint256) view returns (string, string, address, uint256, uint256, bool, uint256)",
   "function getVoteOptionsCount(uint256) view returns (uint256)",
   "function getVoteOption(uint256, uint256) view returns (string, uint256)",
   "function getActiveVoteIds() view returns (uint256[])",
-  "function hasVoted(uint256, address) view returns (bool)"
+  "function hasVoted(uint256, address) view returns (bool)",
+  "event VoteCreated(uint256 indexed voteId, string title, address indexed creator)",
+  "event VoteCast(uint256 indexed voteId, uint256 optionId, address indexed voter)",
+  "event VoteClosed(uint256 indexed voteId)"
 ];
 
 // Replace this with your deployed contract address from Remix IDE
@@ -61,6 +64,13 @@ const createMockContract = () => {
     },
     castVote: async (voteId, optionId) => {
       console.log("Mock contract: castVote called with", {voteId, optionId});
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      const hash = "0x" + Math.random().toString(16).slice(2);
+      console.log("Mock transaction hash:", hash);
+      return { hash };
+    },
+    closeVote: async (voteId) => {
+      console.log("Mock contract: closeVote called with", {voteId});
       await new Promise(resolve => setTimeout(resolve, 1000));
       const hash = "0x" + Math.random().toString(16).slice(2);
       console.log("Mock transaction hash:", hash);
@@ -426,5 +436,41 @@ export const checkWalletConnection = async () => {
       connected: false,
       error: "Error checking wallet connection"
     };
+  }
+};
+
+// Add new function to close a vote
+export const closeVoteOnChain = async (voteId: string) => {
+  try {
+    const contract = await getVotingContract(true);
+    
+    const tx = await contract.closeVote(voteId);
+    
+    // Wait for transaction to be mined
+    let receipt;
+    try {
+      receipt = await tx.wait();
+    } catch (e) {
+      console.log("Error waiting for transaction");
+      throw e;
+    }
+    
+    toast({
+      title: "Vote Closed",
+      description: "The vote has been closed successfully!",
+    });
+    
+    return {
+      success: true,
+      transactionHash: tx.hash
+    };
+  } catch (error) {
+    console.error("Error closing vote on blockchain:", error);
+    toast({
+      title: "Transaction Error",
+      description: "Failed to close vote. Please try again.",
+      variant: "destructive"
+    });
+    throw error;
   }
 };

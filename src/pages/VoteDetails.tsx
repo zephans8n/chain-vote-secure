@@ -1,7 +1,6 @@
-
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchVoteDetails, castVote } from '@/lib/web3';
+import { fetchVoteDetails, castVote, closeVoteOnChain } from '@/lib/web3';
 import { useVoting } from '@/context/VotingContext';
 import { useToast } from '@/hooks/use-toast';
 import Navbar from '@/components/Navbar';
@@ -38,6 +37,28 @@ const VoteDetails = () => {
     if (days > 0) return `${days} day${days > 1 ? 's' : ''} ${hours} hr${hours > 1 ? 's' : ''} left`;
     if (hours > 0) return `${hours} hr${hours > 1 ? 's' : ''} ${minutes} min${minutes > 1 ? 's' : ''} left`;
     return `${minutes} minute${minutes > 1 ? 's' : ''} left`;
+  };
+
+  const handleCloseVote = async () => {
+    if (!isConnected || !id) return;
+    
+    try {
+      await closeVoteOnChain(id);
+      const updatedDetails = await fetchVoteDetails(id);
+      setVoteData(updatedDetails);
+      
+      toast({
+        title: "Success",
+        description: "Vote has been closed successfully",
+      });
+    } catch (error) {
+      console.error("Error closing vote:", error);
+      toast({
+        title: "Error",
+        description: "Failed to close vote",
+        variant: "destructive"
+      });
+    }
   };
 
   useEffect(() => {
@@ -163,9 +184,19 @@ const VoteDetails = () => {
         <div className="mb-6">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <h1 className="text-3xl font-bold">{voteData.title}</h1>
-            <Badge variant={isActive ? "default" : voteData.status === 'upcoming' ? "outline" : "secondary"}>
-              {voteData.status.charAt(0).toUpperCase() + voteData.status.slice(1)}
-            </Badge>
+            <div className="flex gap-2">
+              {isConnected && voteData?.creator === address && voteData?.isActive && (
+                <Button 
+                  variant="destructive" 
+                  onClick={handleCloseVote}
+                >
+                  Close Vote
+                </Button>
+              )}
+              <Badge variant={isActive ? "default" : voteData.status === 'upcoming' ? "outline" : "secondary"}>
+                {voteData.status.charAt(0).toUpperCase() + voteData.status.slice(1)}
+              </Badge>
+            </div>
           </div>
           <p className="text-gray-600 mt-2">{voteData.description}</p>
         </div>
