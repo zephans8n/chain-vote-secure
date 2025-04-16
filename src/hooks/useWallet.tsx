@@ -41,7 +41,7 @@ export function useWallet() {
       checkConnection();
       
       // Set up listeners for account and network changes
-      const { ethereum } = window as any;
+      const { ethereum } = window;
       
       if (ethereum) {
         const handleAccountsChanged = (accounts: string[]) => {
@@ -108,7 +108,12 @@ export function useWallet() {
       setIsLoading(true);
       const address = await connectWallet();
       const networkName = await getCurrentNetwork();
-      const { ethereum } = window as any;
+      const { ethereum } = window;
+      
+      if (!ethereum) {
+        throw new Error("MetaMask is not installed");
+      }
+      
       const chainId = await ethereum.request({ method: 'eth_chainId' });
       
       setWalletState({

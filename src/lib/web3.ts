@@ -1,3 +1,4 @@
+
 // This file contains utility functions for interacting with Ethereum
 
 import { createVoteOnChain, castVoteOnChain, getActiveVotes, getVoteDetails, checkWalletConnection } from '@/lib/contractUtils';
@@ -16,7 +17,11 @@ export const connectWallet = async (): Promise<string> => {
       throw new Error("MetaMask is not installed. Please install it to use this app.");
     }
 
-    const { ethereum } = window as any;
+    const { ethereum } = window;
+    
+    if (!ethereum) {
+      throw new Error("MetaMask is not installed. Please install it to use this app.");
+    }
     
     // Request account access
     const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
@@ -44,7 +49,7 @@ export const connectWallet = async (): Promise<string> => {
 // Get the current network
 export const getCurrentNetwork = async (): Promise<string> => {
   try {
-    const { ethereum } = window as any;
+    const { ethereum } = window;
     
     if (!ethereum) {
       throw new Error("MetaMask is not installed");
