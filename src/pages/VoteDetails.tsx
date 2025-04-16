@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getVoteDetails, castVote, closeVoteOnChain } from '@/lib/web3';
+import { getVoteDetails, castVote, closeVote } from '@/lib/web3';
 import { useVoting } from '@/context/VotingContext';
 import { useToast } from '@/hooks/use-toast';
 import Navbar from '@/components/Navbar';
@@ -43,7 +43,7 @@ const VoteDetails = () => {
     if (!isConnected || !id) return;
     
     try {
-      await closeVoteOnChain(id);
+      await closeVote(id);
       const updatedDetails = await getVoteDetails(id);
       setVoteData(updatedDetails);
       
