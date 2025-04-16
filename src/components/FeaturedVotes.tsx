@@ -1,11 +1,10 @@
-
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Users, Calendar, ExternalLink, Clock, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { fetchActiveVotes } from "@/lib/web3";
+import { getActiveVotes } from "@/lib/web3";
 import { Vote } from "@/lib/interfaces";
 
 const FeaturedVotes = () => {
@@ -17,7 +16,7 @@ const FeaturedVotes = () => {
     const loadVotes = async () => {
       setIsLoading(true);
       try {
-        const activeVotes = await fetchActiveVotes();
+        const activeVotes = await getActiveVotes();
         if (activeVotes && activeVotes.length > 0) {
           setVotes(activeVotes);
         } else {

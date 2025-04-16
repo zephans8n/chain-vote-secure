@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchVoteDetails, castVote, closeVoteOnChain } from '@/lib/web3';
+import { getVoteDetails, castVote, closeVoteOnChain } from '@/lib/web3';
 import { useVoting } from '@/context/VotingContext';
 import { useToast } from '@/hooks/use-toast';
 import Navbar from '@/components/Navbar';
@@ -44,7 +44,7 @@ const VoteDetails = () => {
     
     try {
       await closeVoteOnChain(id);
-      const updatedDetails = await fetchVoteDetails(id);
+      const updatedDetails = await getVoteDetails(id);
       setVoteData(updatedDetails);
       
       toast({
@@ -67,7 +67,7 @@ const VoteDetails = () => {
       
       setLoading(true);
       try {
-        const details = await fetchVoteDetails(id);
+        const details = await getVoteDetails(id);
         if (details) {
           setVoteData(details);
         } else {
@@ -116,7 +116,7 @@ const VoteDetails = () => {
     try {
       await castVote(id!, selectedOption);
       
-      const updatedDetails = await fetchVoteDetails(id!);
+      const updatedDetails = await getVoteDetails(id!);
       setVoteData(updatedDetails);
       
       toast({

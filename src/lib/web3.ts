@@ -1,11 +1,9 @@
 
-import {
-  createVoteOnChain,
-  castVoteOnChain,
-  getActiveVotes,
-  getVoteDetails,
-  closeVoteOnChain as closeVoteContract
-} from './ethereum/votes';
+import { createVoteOnChain as createVoteContract, 
+         castVoteOnChain as castVoteContract,
+         getVoteDetails as getVoteDetailsContract,
+         closeVoteOnChain as closeVoteContract } from './ethereum/votes';
+import { WalletStatus } from './ethereum/types';
 
 export const isMetaMaskInstalled = () => {
   return typeof window !== 'undefined' && Boolean(window.ethereum && window.ethereum.isMetaMask);
@@ -50,6 +48,27 @@ export const getCurrentNetwork = async (): Promise<string> => {
   }
 };
 
+export const checkWalletStatus = async (): Promise<WalletStatus> => {
+  try {
+    const { ethereum } = window as any;
+    if (!ethereum) {
+      return { connected: false };
+    }
+
+    const accounts = await ethereum.request({ method: 'eth_accounts' });
+    const chainId = await ethereum.request({ method: 'eth_chainId' });
+    
+    return {
+      connected: accounts.length > 0,
+      address: accounts[0] || undefined,
+      chainId: chainId
+    };
+  } catch (error) {
+    console.error("Error checking wallet status:", error);
+    return { connected: false, error: "Failed to check wallet status" };
+  }
+};
+
 export const switchToCorrectNetwork = async (requiredChainId: string) => {
   try {
     const { ethereum } = window as any;
@@ -68,10 +87,10 @@ export const switchToCorrectNetwork = async (requiredChainId: string) => {
   }
 };
 
-export {
-  createVoteOnChain,
-  castVoteOnChain,
-  getActiveVotes,
-  getVoteDetails,
-  closeVoteContract as closeVoteOnChain
-};
+// Re-export the contract functions with more user-friendly names
+export const createVote = createVoteContract;
+export const castVote = castVoteContract;
+export const getVoteDetails = getVoteDetailsContract;
+export const closeVoteOnChain = closeVoteContract;
+export const getActiveVotes = getVoteDetailsContract;
+

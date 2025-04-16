@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -7,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Users, Calendar, ExternalLink, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
-import { fetchActiveVotes } from "@/lib/web3";
+import { getActiveVotes } from "@/lib/web3";
 import { Vote } from "@/lib/interfaces";
 
 const VotesList = () => {
@@ -19,7 +18,7 @@ const VotesList = () => {
     const loadVotes = async () => {
       setIsLoading(true);
       try {
-        const activeVotes = await fetchActiveVotes();
+        const activeVotes = await getActiveVotes();
         if (activeVotes && activeVotes.length > 0) {
           setVotes(activeVotes);
         } else {
@@ -38,7 +37,6 @@ const VotesList = () => {
     loadVotes();
   }, []);
 
-  // Calculate days left from deadline
   const calculateDaysLeft = (deadline: string) => {
     const deadlineDate = new Date(deadline);
     const currentDate = new Date();
