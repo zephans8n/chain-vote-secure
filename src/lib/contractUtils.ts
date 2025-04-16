@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 // Contract ABI - Copy this from Remix IDE after compilation
 const CONTRACT_ABI = [

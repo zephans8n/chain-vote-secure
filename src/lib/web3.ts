@@ -1,8 +1,7 @@
-
 // This file contains utility functions for interacting with Ethereum
 
-import { createVoteOnChain, castVoteOnChain, getActiveVotes, getVoteDetails, checkWalletConnection } from '@/lib/contractUtils';
-import { toast } from "@/components/ui/use-toast";
+import { createVoteOnChain, castVoteOnChain, getActiveVotes, getVoteDetails, checkWalletConnection, closeVoteOnChain as closeVoteContract } from '@/lib/contractUtils';
+import { toast } from "@/hooks/use-toast";
 
 // Check if MetaMask is installed
 export const isMetaMaskInstalled = () => {
@@ -228,4 +227,21 @@ export const fetchVoteDetails = async (voteId: string) => {
 // Function to check wallet connection status
 export const checkWalletStatus = async () => {
   return await checkWalletConnection();
+};
+
+// Close a vote using the smart contract
+export const closeVoteOnChain = async (voteId: string) => {
+  try {
+    console.log(`Closing vote ${voteId}`);
+    return await closeVoteContract(voteId);
+  } catch (error) {
+    console.error("Error closing vote:", error);
+    toast({
+      title: "Error Closing Vote",
+      description: error instanceof Error ? error.message : "An unknown error occurred",
+      variant: "destructive"
+    });
+    
+    throw error;
+  }
 };
