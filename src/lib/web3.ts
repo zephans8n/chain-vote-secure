@@ -2,7 +2,8 @@
 import { createVoteOnChain as createVoteContract, 
          castVoteOnChain as castVoteContract,
          getVoteDetails as getVoteDetailsContract,
-         closeVoteOnChain as closeVoteContract } from './ethereum/votes';
+         closeVoteOnChain as closeVoteContract,
+         getActiveVotes as getActiveVotesContract } from './ethereum/votes';
 import { WalletStatus } from './ethereum/types';
 
 export const isMetaMaskInstalled = () => {
@@ -91,6 +92,5 @@ export const switchToCorrectNetwork = async (requiredChainId: string) => {
 export const createVote = createVoteContract;
 export const castVote = castVoteContract;
 export const getVoteDetails = getVoteDetailsContract;
-export const closeVoteOnChain = closeVoteContract;
-export const getActiveVotes = getVoteDetailsContract;
-
+export const closeVote = closeVoteContract;
+export const getActiveVotes = getActiveVotesContract;

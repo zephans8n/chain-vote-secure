@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,6 +7,7 @@ import { Users, Calendar, ExternalLink, Clock, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getActiveVotes } from "@/lib/web3";
 import { Vote } from "@/lib/interfaces";
+import { VoteDetails } from "@/lib/ethereum/types";
 
 const FeaturedVotes = () => {
   const [votes, setVotes] = useState<Vote[]>([]);
@@ -18,7 +20,26 @@ const FeaturedVotes = () => {
       try {
         const activeVotes = await getActiveVotes();
         if (activeVotes && activeVotes.length > 0) {
-          setVotes(activeVotes);
+          // Convert VoteDetails[] to Vote[] format
+          const formattedVotes: Vote[] = activeVotes.map(vote => ({
+            id: vote.id,
+            title: vote.title,
+            description: vote.description,
+            creator: vote.creator,
+            startDate: vote.startDate,
+            endDate: vote.endDate,
+            status: vote.status as 'draft' | 'active' | 'upcoming' | 'completed' | 'canceled',
+            participants: parseInt(vote.participants),
+            options: vote.options.map(opt => ({
+              id: opt.id,
+              text: opt.text,
+              votes: parseInt(opt.votes),
+              percentage: parseFloat(opt.percentage)
+            })),
+            visibility: 'public'
+          }));
+          
+          setVotes(formattedVotes);
         } else {
           setVotes([]);
           setError("No active votes found");

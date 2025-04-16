@@ -43,11 +43,11 @@ export const getVoteDetails = async (voteId: string): Promise<VoteDetails | null
   }
 };
 
-export const getActiveVotes = async () => {
+export const getActiveVotes = async (): Promise<VoteDetails[]> => {
   try {
     const contract = await getVotingContract();
     const activeVoteIds = await contract.getActiveVoteIds();
-    const votes = [];
+    const votes: VoteDetails[] = [];
     
     for (const voteId of activeVoteIds) {
       const vote = await getVoteDetails(voteId.toString());
