@@ -1,3 +1,4 @@
+
 import { ethers } from 'ethers';
 import { toast } from "@/components/ui/use-toast";
 
@@ -13,6 +14,7 @@ const CONTRACT_ABI = [
 ];
 
 // Replace this with your deployed contract address from Remix IDE
+// IMPORTANT: After deploying your contract in Remix IDE, update this address
 const CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 export interface VoteData {
@@ -42,6 +44,7 @@ export const getVotingContract = async (withSigner = false) => {
     return new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
   } catch (error) {
     console.error("Error getting contract instance:", error);
+    // Return mock contract for development when real contract is unavailable
     return createMockContract();
   }
 };

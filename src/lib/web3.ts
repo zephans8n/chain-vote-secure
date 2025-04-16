@@ -1,4 +1,3 @@
-
 // This file contains utility functions for interacting with Ethereum
 
 import { createVoteOnChain, castVoteOnChain, getActiveVotes, getVoteDetails, checkWalletConnection } from '@/lib/contractUtils';
@@ -6,8 +5,7 @@ import { toast } from "@/components/ui/use-toast";
 
 // Check if MetaMask is installed
 export const isMetaMaskInstalled = () => {
-  const { ethereum } = window as any;
-  return Boolean(ethereum && ethereum.isMetaMask);
+  return typeof window !== 'undefined' && Boolean(window.ethereum && window.ethereum.isMetaMask);
 };
 
 // Connect to wallet and return address
@@ -156,8 +154,58 @@ export const fetchActiveVotes = async () => {
   } catch (error) {
     console.error("Error fetching active votes:", error);
     // Return mock data if blockchain fetch fails
-    return [];
+    return getMockVotes();
   }
+};
+
+// Mock votes for testing when blockchain is unavailable
+const getMockVotes = () => {
+  return [
+    {
+      id: '0',
+      title: 'Governance Proposal #1',
+      description: 'Should we increase the community fund allocation?',
+      creator: '0x1234567890abcdef1234567890abcdef12345678',
+      startDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+      endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      status: 'active',
+      participants: '42',
+      options: [
+        { id: '0', text: 'Yes', votes: '28', percentage: '66.67' },
+        { id: '1', text: 'No', votes: '14', percentage: '33.33' }
+      ]
+    },
+    {
+      id: '1',
+      title: 'Protocol Upgrade',
+      description: 'Should we implement the proposed protocol upgrade?',
+      creator: '0xabcdef1234567890abcdef1234567890abcdef12',
+      startDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      endDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+      status: 'active',
+      participants: '36',
+      options: [
+        { id: '0', text: 'Approve', votes: '22', percentage: '61.11' },
+        { id: '1', text: 'Reject', votes: '10', percentage: '27.78' },
+        { id: '2', text: 'Abstain', votes: '4', percentage: '11.11' }
+      ]
+    },
+    {
+      id: '2',
+      title: 'Board Member Election',
+      description: 'Annual election for the two open positions on the governing board.',
+      creator: '0x9876543210abcdef9876543210abcdef98765432',
+      startDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+      endDate: new Date(Date.now() + 9 * 24 * 60 * 60 * 1000).toISOString(),
+      status: 'upcoming',
+      participants: '0',
+      options: [
+        { id: '0', text: 'Candidate A', votes: '0', percentage: '0' },
+        { id: '1', text: 'Candidate B', votes: '0', percentage: '0' },
+        { id: '2', text: 'Candidate C', votes: '0', percentage: '0' }
+      ]
+    }
+  ];
 };
 
 // Fetch vote details from the blockchain
